@@ -7,11 +7,15 @@ import { ConfigService } from '@nestjs/config'
 import { GlobalVariableContainer } from '../../global-variables'
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {User} from '../user/entities/user.entity';
-
+import { Verification } from '../verification/entities/verification.entity'
+import { VerificationService } from '../verification/verification.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([Verification])
+  ],
   controllers: [AuthController],
-  providers: [UserService, AuthService, ApiService, ConfigService, GlobalVariableContainer]
+  providers: [VerificationService, UserService, AuthService, ApiService, ConfigService, GlobalVariableContainer]
 })
 export class AuthModule {}
