@@ -64,7 +64,7 @@ export class ApiService {
     
         const requestData = {
           email: user.email,
-          firstName: user.email.fname,
+          firstName: user.fname,
           lastName: user.lname
         };
     

@@ -15,15 +15,18 @@ export class AuthController {
         private readonly verificationService: VerificationService
         ) {}
 
-    @Post('signUp')
-    async signUp(@Req() request: Request, @Res() res: Response)
+
+  @Post('verifyEmail')
+  async verifyEmail(@Req() request: Request, @Res() res: Response)
+  {
+    const user = request.body    
+    if(await this.verificationService.verifyEmail(user))
     {
-        const user = request.body;     
-        const aMemberUser = await this.apiService.createAMemberUser(user);
-        if(aMemberUser.status === 200)
+      const aMemberUser = await this.apiService.createAMemberUser(user);
+
+      if(aMemberUser.status === 200)
         {
             const aMemberId = aMemberUser.data[0].login
-            const email = aMemberUser.data[0].email
             const basiqUser = await this.apiService.createBasiqUser(user);
             const basiqId = basiqUser.data.id
             await this.userService.create(aMemberId,basiqId)
@@ -42,11 +45,17 @@ export class AuthController {
                   message: 'An error occurred.',
                 });
               });
-            
         }
-        
-        
     }
+    else
+    {
+      return res.status(200).json({
+        status: 404,
+        code: 'error',
+        message: 'Wrong Verification Code',
+      });
+    }
+  }
 
     @Post('sendEmail')
     async sendEmail(@Body() user, @Res() res)

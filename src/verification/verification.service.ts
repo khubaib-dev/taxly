@@ -10,6 +10,17 @@ export class VerificationService {
     @InjectRepository(Verification)
     private readonly verifyRepository: Repository<Verification>,
   ) {}
+
+  async verifyEmail(user)
+  {
+    const id = user.id
+    const verifyCode = await this.verifyRepository.findOne({ where: { id } })
+      if (verifyCode.verification_code === user.code) {
+        return true
+      } else {
+        return false
+      }
+  }
   
   create(code) {
     const verification = new Verification();
