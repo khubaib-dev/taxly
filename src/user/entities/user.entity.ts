@@ -15,10 +15,10 @@ export class User {
     @Column({type: 'text'})
     basiq_id: string
 
-    @OneToOne(() => Setting, setting => setting.user)
+    @OneToOne(() => Setting, setting => setting.user, { eager: true })
     setting: Setting;
 
-    @OneToMany(() => Transaction, transaction => transaction.user)
+    @OneToMany(() => Transaction, transaction => transaction.user, { eager: true })
     transactions: Transaction[];
 
 }
