@@ -7,8 +7,14 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { ApiService } from './api/api.service';
 import { GlobalVariableContainer } from '../global-variables'
-// import { MailerModule } from '@nestjs-modules/mailer'
 import { VerificationModule } from './verification/verification.module';
+import { SettingModule } from './setting/setting.module';
+import {User} from './user/entities/user.entity'
+import {Setting} from './setting/entities/setting.entity'
+import {Transaction} from './transaction/entities/transaction.entity'
+import { TransactionModule } from './transaction/transaction.module'
+import { ChartOfAccount } from './chart-of-account/entities/chart-of-account.entity'
+import { ChartOfAccountModule } from './chart-of-account/chart-of-account.module'
 
 
 @Module({
@@ -16,17 +22,6 @@ import { VerificationModule } from './verification/verification.module';
   controllers: [AppController],
   providers: [AppService, ApiService, GlobalVariableContainer],
   imports: [
-    // MailerModule.forRoot({
-    //   transport: {
-    //     host: 'smtp-relay.sendinblue.com',
-    //     port: 587,
-    //     secure: false, // Set to true if using SSL/TLS
-    //     auth: {
-    //       user: 'taxpixtralia@gmail.com',
-    //       pass: '10KOVHDc5vgdnCA4',
-    //     },
-    //   },
-    // }),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -38,9 +33,13 @@ import { VerificationModule } from './verification/verification.module';
       autoLoadEntities: true,
       synchronize: true, // set to false in production
     }),
+    TypeOrmModule.forFeature([User, Setting, Transaction, ChartOfAccount]),
     UserModule,
     AuthModule,
     VerificationModule,
+    SettingModule,
+    TransactionModule,
+    ChartOfAccountModule
     ],
 })
 export class AppModule {}

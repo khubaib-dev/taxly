@@ -1,4 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne,
+    OneToMany } from 'typeorm'
+import { Setting } from '../../setting/entities/setting.entity'
+import { Transaction } from '../../transaction/entities/transaction.entity'
 
 
 @Entity()
@@ -12,22 +15,10 @@ export class User {
     @Column({type: 'text'})
     basiq_id: string
 
-    @Column({nullable: true})
-    tax_reminder: boolean
+    @OneToOne(() => Setting, setting => setting.user)
+    setting: Setting;
 
-    @Column({nullable: true})
-    notification_type: boolean
-
-    @Column({nullable: true})
-    work_status: number
-
-    @Column({nullable: true})
-    travel_type: number
-
-    @Column({nullable: true})
-    work_type: boolean
-
-    @Column({nullable: true})
-    business_meal: number
+    @OneToMany(() => Transaction, transaction => transaction.user)
+    transactions: Transaction[];
 
 }
