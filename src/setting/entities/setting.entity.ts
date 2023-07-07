@@ -19,14 +19,23 @@ export class Setting {
     notification_type: boolean
 
     @Column({nullable: true})
-    work_status: number
+    work_status: string
 
     @Column({nullable: true})
-    travel_type: number
+    travel_type: string
 
     @Column({nullable: true})
     work_type: boolean
 
     @Column({nullable: true})
     business_meal: number
+
+    @Column({nullable: true})
+    f1: number
+
+    @Column({nullable: true})
+    f2: string
+
+    @Column({nullable: true})
+    f3: string
 }

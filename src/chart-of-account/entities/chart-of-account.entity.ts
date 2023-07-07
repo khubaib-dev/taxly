@@ -7,5 +7,8 @@ export class ChartOfAccount {
     id: number
 
     @Column()
+    parent_id: number
+
+    @Column()
     category: string 
 }
