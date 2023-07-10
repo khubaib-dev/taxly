@@ -12,6 +12,14 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  async findByAmember(id: string): Promise<User | undefined> {
+    const user = await this.userRepository.findOne({
+      where: {
+        amember_id: id,
+      },
+    });
+    return user;
+  }
 
    async create(amemberId,basiqId) {
     const user = new User();

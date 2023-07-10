@@ -5,15 +5,40 @@ import { GlobalVariableContainer } from '../../global-variables'
 import { UserService } from '../user/user.service'
 import { Verification } from '../verification/entities/verification.entity'
 import { VerificationService } from '../verification/verification.service'
-
+import { AuthService } from './auth.service'
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
     constructor(private readonly apiService: ApiService,
         private globalVariableContainer: GlobalVariableContainer,
         private readonly userService: UserService,
-        private readonly verificationService: VerificationService
+        private readonly verificationService: VerificationService,
+        private readonly authService: AuthService,
+        private jwtService: JwtService
         ) {}
+
+  @Post('login')
+  async login(@Req() request: Request, @Res() res: Response)
+  {
+    const user = request.body
+    await this.authService.login(user)
+    .then(data => {
+      return res.status(200).json({
+        status: 200,
+        code: 'ok',
+        data,
+      });
+    })
+    .catch(error => {
+      // Handle error
+      return res.status(500).json({
+        status: 500,
+        code: 'error',
+        message: 'An error occurred.',
+      });
+    });
+  }
 
 
   @Post('verifyEmail')

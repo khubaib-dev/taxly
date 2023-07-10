@@ -25,11 +25,11 @@ import { ChartOfAccountModule } from './chart-of-account/chart-of-account.module
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: process.env.DB_HOST,
       port: 3306,
-      username: 'root',
-      password: '',
-      database: 'taxly',
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
       autoLoadEntities: true,
       synchronize: true, // set to false in production
     }),
