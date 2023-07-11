@@ -6,7 +6,8 @@ import { UserService } from '../user/user.service'
 import { Verification } from '../verification/entities/verification.entity'
 import { VerificationService } from '../verification/verification.service'
 import { AuthService } from './auth.service'
-import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt'
+import axios from 'axios'
 
 @Controller('auth')
 export class AuthController {
@@ -23,11 +24,10 @@ export class AuthController {
   {
     const user = request.body
     await this.authService.login(user)
-    .then(data => {
+    .then(response => {
       return res.status(200).json({
         status: 200,
-        code: 'ok',
-        data,
+        response,
       });
     })
     .catch(error => {
@@ -85,6 +85,21 @@ export class AuthController {
     @Post('sendEmail')
     async sendEmail(@Body() user, @Res() res)
   {
+    const aMemberKey = process.env.AMEMBER_API_KEY
+    const aMemberUrl = process.env.AMEMBER_BASEURL
+    const payloadAccess = {
+    params: {
+    _key: aMemberKey,
+    email: user.email
+    }}
+    const checkAmemberUserExist = await axios.get(`${aMemberUrl}/check-access/by-email`,payloadAccess)
+      if(checkAmemberUserExist.data.ok){
+        return res.status(200).json({
+          status: 400,
+          ok: false,
+          message: 'Email Already Exist'
+        });
+      }
     const randomCode = Math.floor(1000 + Math.random() * 9000).toString()
 
     const to = user.email
@@ -97,7 +112,7 @@ export class AuthController {
     .then(data => {
       return res.status(200).json({
         status: 200,
-        code: 'ok',
+        ok: true,
         data,
       });
     })
@@ -106,7 +121,7 @@ export class AuthController {
       console.log('Error side')
       return res.status(500).json({
         status: 500,
-        code: 'error',
+        ok: false,
         message: error,
       });
     });

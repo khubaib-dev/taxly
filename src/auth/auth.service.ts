@@ -32,7 +32,10 @@ export class AuthService {
         }
         else
         {
-            return false
+            return {
+                ok: false,
+                message: "Email not exist"
+            }
         }
 
         const payload = {
@@ -42,12 +45,12 @@ export class AuthService {
         pass: password
         }}
 
-        const auth = await axios.get(`${base_url}/check-access/by-login-pass`,payload)    
-
+        const auth = await axios.get(`${base_url}/check-access/by-login-pass`,payload)
         try {
             if (auth.data.ok) {
                 const dbUser = await this.userService.findByAmember(auth.data.login);        
                 return {
+                    ok: true,
                     token: await this.jwtService.signAsync({
                     sub: dbUser.id
                     },{secret: process.env.JWT_SECRET})
@@ -55,7 +58,7 @@ export class AuthService {
             } else {
                 return {
                         ok: false,
-                        error: 'Wrong Credentials'
+                        message: "Wrong Credentials"
                     }
             }
         } catch (error) {
