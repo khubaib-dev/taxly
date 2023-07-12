@@ -12,16 +12,19 @@ export class Setting {
     @JoinColumn({ name: 'userId' })
     user: User;
 
+    @Column({ type: 'longtext' })
+    help: string;
+
     @Column({nullable: true})
     tax_reminder: boolean
 
     @Column({nullable: true})
     notification_type: boolean
 
-    @Column({nullable: true})
+    @Column({nullable: true, type: 'longtext'})
     work_status: string
 
-    @Column({nullable: true})
+    @Column({nullable: true, type: 'longtext'})
     travel_type: string
 
     @Column({nullable: true})

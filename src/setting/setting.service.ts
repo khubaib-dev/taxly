@@ -1,26 +1,39 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSettingDto } from './dto/create-setting.dto';
-import { UpdateSettingDto } from './dto/update-setting.dto';
+import { Injectable, Body } from '@nestjs/common'
+import { Setting } from './entities/setting.entity'
+import { User } from '../user/entities/user.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { UpdateSettingDto } from './dto/update-setting.dto'
 
 @Injectable()
 export class SettingService {
-  create(createSettingDto: CreateSettingDto) {
-    return 'This action adds a new setting';
+
+  constructor(
+  @InjectRepository(Setting)
+    private readonly settingRepository: Repository<Setting>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
+  ) {}
+
+  async update(id, request){
+    // Find the user by ID
+    
+    var user = await this.userRepository.findOne({where:{ id }})
+
+    var setting = user.setting
+
+    if (!setting) {
+      throw new Error('User not found');
+    }
+
+    // Update seting
+    const updatedUser = await this.settingRepository.update(setting.id, request);
+
+    user = await this.userRepository.findOne({where:{ id }})
+
+    setting = user.setting
+    
+    return setting;
   }
 
-  findAll() {
-    return `This action returns all setting`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} setting`;
-  }
-
-  update(id: number, updateSettingDto: UpdateSettingDto) {
-    return `This action updates a #${id} setting`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} setting`;
-  }
 }

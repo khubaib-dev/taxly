@@ -11,10 +11,11 @@ import { Verification } from '../verification/entities/verification.entity'
 import { VerificationService } from '../verification/verification.service'
 import { PassportModule } from '@nestjs/passport'
 import { JwtModule, JwtService } from '@nestjs/jwt'
+import { Setting } from '../setting/entities/setting.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User,Setting]),
     TypeOrmModule.forFeature([Verification]),
     PassportModule,
     JwtModule

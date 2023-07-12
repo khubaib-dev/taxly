@@ -4,12 +4,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity'
+import { Setting } from '../setting/entities/setting.entity'
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Setting)
+    private readonly settingRepository: Repository<Setting>,
   ) {}
 
   async findByAmember(id: string): Promise<User | undefined> {
@@ -22,10 +25,16 @@ export class UserService {
   }
 
    async create(amemberId,basiqId) {
-    const user = new User();
-    user.amember_id = amemberId;
-    user.basiq_id = basiqId;
-    return this.userRepository.save(user);
+    const user = new User()
+    user.amember_id = amemberId
+    user.basiq_id = basiqId
+    const storeUser = await this.userRepository.save(user)
+
+    const setting = new Setting()
+    setting.user = storeUser
+    this.settingRepository.save(setting)
+    
+    return storeUser
   }
 
   findAll() {

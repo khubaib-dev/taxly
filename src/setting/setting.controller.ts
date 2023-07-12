@@ -1,34 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post,
+  UseGuards, Req, Res, Request } from '@nestjs/common';
 import { SettingService } from './setting.service';
-import { CreateSettingDto } from './dto/create-setting.dto';
-import { UpdateSettingDto } from './dto/update-setting.dto';
+import { UpdateSettingDto } from './dto/update-setting.dto'
+import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('setting')
 export class SettingController {
   constructor(private readonly settingService: SettingService) {}
 
-  @Post()
-  create(@Body() createSettingDto: CreateSettingDto) {
-    return this.settingService.create(createSettingDto);
+  // @UseGuards(AuthGuard)
+  @Post('update')
+  async update(@Request() request, @Res() res) {
+    const setting = request.body
+    // const id = request.user.sub
+    const id = 2
+
+    await this.settingService.update(id, setting)
+    .then(data => {
+      return res.status(200).json({
+        status: 200,
+        ok: true,
+        data,
+      });
+    })
+    .catch(error => {
+      // Handle error
+      return res.status(200).json({
+        status: 500,
+        ok: false,
+        message: error,
+      });
+    });
   }
 
-  @Get()
-  findAll() {
-    return this.settingService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.settingService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSettingDto: UpdateSettingDto) {
-    return this.settingService.update(+id, updateSettingDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.settingService.remove(+id);
-  }
 }

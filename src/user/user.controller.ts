@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch,
-  UseGuards, Param, Delete } from '@nestjs/common';
+  UseGuards, Param, Delete, Request } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -16,7 +16,9 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Get()
-  findAll() {
+  findAll(@Request() request) {
+    const userId = request.user.sub
+    console.log(userId)
     return this.userService.findAll();
   }
 
