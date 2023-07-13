@@ -26,6 +26,12 @@ export class Setting {
 
     @Column({nullable: true, type: 'longtext'})
     travel_type: string
+    
+    @Column({nullable: true, type: 'longtext'})
+    personal_deduction: string
+    
+    @Column({nullable: true, type: 'longtext'})
+    profession: string
 
     @Column({nullable: true})
     work_type: boolean

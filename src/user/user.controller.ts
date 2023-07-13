@@ -5,6 +5,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '../auth/auth.guard';
 
+var bcrypt = require('bcrypt')
+
+
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -12,6 +15,17 @@ export class UserController {
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     // return this.userService.create(createUserDto);
+  }
+
+  @Post('check')
+  check(@Request() request){
+    const req = request.body
+    try {
+      return bcrypt.compareSync(req.password, '$2y$10$kd.W7zB8FmbkIFfaMfO3UOOmwu8BxW6Slo.7aln8BEbJV0MYnnfwy')
+      
+    } catch (error) {
+      console.log("error "+error)
+    }
   }
 
   @UseGuards(AuthGuard)

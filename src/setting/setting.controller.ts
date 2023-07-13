@@ -10,12 +10,11 @@ import { AuthGuard } from '../auth/auth.guard';
 export class SettingController {
   constructor(private readonly settingService: SettingService) {}
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post('update')
   async update(@Request() request, @Res() res) {
     const setting = request.body
-    // const id = request.user.sub
-    const id = 2
+    const id = request.user.sub
 
     await this.settingService.update(id, setting)
     .then(data => {
