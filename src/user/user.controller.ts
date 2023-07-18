@@ -32,8 +32,15 @@ export class UserController {
   @Get()
   findAll(@Request() request) {
     const userId = request.user.sub
-    console.log(userId)
-    return this.userService.findAll();
+    return this.userService.findAll()
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('basiq')
+  async findBasiq(@Request() request)
+  {
+    const userId = request.user.sub
+    return await this.userService.basiqUser(userId)
   }
 
   @Get(':id')

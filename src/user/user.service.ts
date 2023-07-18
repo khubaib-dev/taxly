@@ -5,15 +5,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity'
 import { Setting } from '../setting/entities/setting.entity'
+import axios, {AxiosRequestConfig} from 'axios'
+import * as qs from 'qs';
 
 @Injectable()
 export class UserService {
+  private readonly basiqAPI: string
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(Setting)
     private readonly settingRepository: Repository<Setting>,
-  ) {}
+  ) {
+    this.basiqAPI = process.env.BASIQ_API_KEY;
+  }
 
   async findByAmember(id: string): Promise<User | undefined> {
     const user = await this.userRepository.findOne({
@@ -40,6 +46,34 @@ export class UserService {
   findAll() {
     const users = this.userRepository.find()
     return users
+  }
+
+  async basiqUser(id)
+  {
+    const authToken = `Basic ${this.basiqAPI}`;
+    const config = {
+      headers: {
+        Authorization: authToken,
+        accept: 'application/json',
+        'basiq-version': '3.0'
+      },
+    };
+  
+    const url = 'https://au-api.basiq.io/token';
+    
+    try {
+      const data  = await axios.post(url, qs.stringify({ scope: 'SERVER_ACCESS' }), config);
+      const user = await this.userRepository.findOne({ where: { id } })
+      return {
+        ok: true,
+        token: data.data.access_token,
+        basiq_id: user.basiq_id
+      }
+  
+    } catch (error) {
+      console.error('Failed to create user', error.response.data);
+      throw new Error(`Failed to create user: ${error.message}`);
+    }
   }
 
   async findOne(id: number) {
