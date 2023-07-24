@@ -9,6 +9,9 @@ export class ChartOfAccount {
     @Column()
     parent_id: number
 
-    @Column()
+    @Column({nullable: true})
+    code: number
+
+    @Column({type: 'longtext'})
     category: string 
 }

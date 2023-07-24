@@ -17,17 +17,6 @@ export class UserController {
     // return this.userService.create(createUserDto);
   }
 
-  @Post('check')
-  check(@Request() request){
-    const req = request.body
-    try {
-      return bcrypt.compareSync(req.password, '$2y$10$kd.W7zB8FmbkIFfaMfO3UOOmwu8BxW6Slo.7aln8BEbJV0MYnnfwy')
-      
-    } catch (error) {
-      console.log("error "+error)
-    }
-  }
-
   @UseGuards(AuthGuard)
   @Get()
   findAll(@Request() request) {
@@ -41,6 +30,13 @@ export class UserController {
   {
     const userId = request.user.sub
     return await this.userService.basiqUser(userId)
+  }
+  
+  @UseGuards(AuthGuard)
+  @Post('createConnection')
+  async createConnection(@Request() request,@Body() body: { loginId: string; password: string; institution:  string  }) {
+    const userId = request.user.sub
+    return await this.userService.createConnection(userId,body)
   }
 
   @Get(':id')

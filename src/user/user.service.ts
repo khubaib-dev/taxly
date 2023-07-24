@@ -48,6 +48,59 @@ export class UserService {
     return users
   }
 
+  async createConnection(id,body)
+  {
+    const user = await this.userRepository.findOne({ where: { id } })
+    const authToken = `Basic ${this.basiqAPI}`;
+    const config = {
+      headers: {
+        Authorization: authToken,
+        accept: 'application/json',
+        'basiq-version': '3.0'
+      },
+    };
+
+    const tokenData = { scope:'CLIENT_ACCESS', userId:user.basiq_id};
+  
+    const url = 'https://au-api.basiq.io/token';
+    
+      const data  = await axios.post(url, tokenData, config);
+      
+      
+      var basiqData = JSON.stringify({
+        "loginId": body.loginId,
+        "password": body.password,
+        "institution": {
+          "id": body.institution
+        }
+      })
+
+      var basiqConfig = {
+        method: 'post',
+        url: `https://au-api.basiq.io/users/${user.basiq_id}/connections`,
+        data : basiqData,
+        headers: { 
+          'Authorization': `Bearer ${data.data.access_token}`, 
+          'Accept': 'application/json', 
+          'Content-Type': 'application/json'
+        },
+      };
+
+      return await axios(basiqConfig)
+      .then(function (response) {
+        return {
+          ok: true,
+          data: response
+        };
+      })
+      .catch(function (error) {
+        return {
+          ok: false,
+          data: error
+        }
+      });
+  }
+
   async basiqUser(id)
   {
     const authToken = `Basic ${this.basiqAPI}`;
