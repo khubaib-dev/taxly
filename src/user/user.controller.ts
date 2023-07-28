@@ -33,11 +33,36 @@ export class UserController {
   }
   
   @UseGuards(AuthGuard)
+  @Get('basiqAccounts')
+  async basiqAccounts(@Request() request)
+  {
+    const userId = request.user.sub
+    return await this.userService.basiqAccounts(userId)
+  }
+  
+  @UseGuards(AuthGuard)
+  @Get('basiqTransactions')
+  async basiqTransactions(@Request() request)
+  {
+    const userId = request.user.sub
+    return await this.userService.basiqTransactions(userId)
+  }
+  
+  @UseGuards(AuthGuard)
+  @Get('checkConsent')
+  async checkConsent(@Request() request)
+  {
+    const userId = request.user.sub
+    return await this.userService.checkConsent(userId)
+  }
+  
+  @UseGuards(AuthGuard)
   @Post('createConnection')
   async createConnection(@Request() request,@Body() body: { loginId: string; password: string; institution:  string  }) {
     const userId = request.user.sub
     return await this.userService.createConnection(userId,body)
   }
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {

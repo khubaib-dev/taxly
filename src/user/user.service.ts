@@ -103,6 +103,7 @@ export class UserService {
 
   async basiqUser(id)
   {
+    const user = await this.userRepository.findOne({ where: { id } })
     const authToken = `Basic ${this.basiqAPI}`;
     const config = {
       headers: {
@@ -111,16 +112,140 @@ export class UserService {
         'basiq-version': '3.0'
       },
     };
+    
   
     const url = 'https://au-api.basiq.io/token';
+    const tokenData = { scope:'CLIENT_ACCESS', userId:user.basiq_id};
     
     try {
-      const data  = await axios.post(url, qs.stringify({ scope: 'SERVER_ACCESS' }), config);
+      const data  = await axios.post(url, tokenData, config);
       const user = await this.userRepository.findOne({ where: { id } })
       return {
         ok: true,
         token: data.data.access_token,
         basiq_id: user.basiq_id
+      }
+  
+    } catch (error) {
+      console.error('Failed to create user', error.response.data);
+      throw new Error(`Failed to create user: ${error.message}`);
+    }
+  }
+  
+  
+  async checkConsent(id)
+  {
+    const user = await this.userRepository.findOne({ where: { id } })
+    const authToken = `Basic ${this.basiqAPI}`;
+    const config = {
+      headers: {
+        Authorization: authToken,
+        accept: 'application/json',
+        'basiq-version': '3.0'
+      },
+    };
+    
+  
+    const url = 'https://au-api.basiq.io/token';
+    const tokenData = { scope:'SERVER_ACCESS'};
+    
+    try {
+      const data  = await axios.post(url, tokenData, config);
+
+      const consentConfig = {
+        headers: {
+        'Authorization': `Bearer ${data.data.access_token}`, 
+          'Accept': 'application/json', 
+          'Content-Type': 'application/json'
+        }
+      };
+      const consentUrl = `https://au-api.basiq.io/users/${user.basiq_id}/consents`
+
+      const consents  = await axios.get(consentUrl, consentConfig);
+      return {
+        ok: true,
+        consents: consents.data,
+      }
+  
+    } catch (error) {
+      console.error('Failed to create user', error.response.data);
+      throw new Error(`Failed to create user: ${error.message}`);
+    }
+  }
+
+  async basiqAccounts(id)
+  {
+    const user = await this.userRepository.findOne({ where: { id } })
+    const authToken = `Basic ${this.basiqAPI}`;
+    const config = {
+      headers: {
+        Authorization: authToken,
+        accept: 'application/json',
+        'basiq-version': '3.0'
+      },
+    };
+    
+  
+    const url = 'https://au-api.basiq.io/token';
+    const tokenData = { scope:'SERVER_ACCESS'};
+    
+    try {
+      const data  = await axios.post(url, tokenData, config);
+
+      const accountConfig = {
+        headers: {
+        'Authorization': `Bearer ${data.data.access_token}`, 
+          'Accept': 'application/json', 
+          'Content-Type': 'application/json'
+        }
+      };
+      const accountUrl = `https://au-api.basiq.io/users/${user.basiq_id}/accounts`
+
+      const accounts  = await axios.get(accountUrl, accountConfig);
+      return {
+        ok: true,
+        accounts: accounts.data,
+      }
+  
+    } catch (error) {
+      console.error('Failed to create user', error.response.data);
+      throw new Error(`Failed to create user: ${error.message}`);
+    }
+  }
+  
+  
+  async basiqTransactions(id)
+  {
+    const user = await this.userRepository.findOne({ where: { id } })
+    const authToken = `Basic ${this.basiqAPI}`;
+    const config = {
+      headers: {
+        Authorization: authToken,
+        accept: 'application/json',
+        'basiq-version': '3.0'
+      },
+    };
+    
+  
+    const url = 'https://au-api.basiq.io/token';
+    const tokenData = { scope:'SERVER_ACCESS'};
+    
+    try {
+      const data  = await axios.post(url, tokenData, config);
+
+      const accountConfig = {
+        headers: {
+        'Authorization': `Bearer ${data.data.access_token}`, 
+          'Accept': 'application/json', 
+          'Content-Type': 'application/json'
+        }
+      };
+      const accountUrl = `https://au-api.basiq.io/users/${user.basiq_id}/transactions`
+
+      const transactions  = await axios.get(accountUrl, accountConfig);
+      return {
+        ok: true,
+        transactions: transactions.data,
       }
   
     } catch (error) {

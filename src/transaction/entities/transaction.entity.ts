@@ -11,6 +11,9 @@ export class Transaction {
     
     @Column()
     amount: number
+    
+    @Column()
+    flag: string
 
     @ManyToOne(() => User, user => user.transactions)
     user: User;
