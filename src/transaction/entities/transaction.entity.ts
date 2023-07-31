@@ -6,13 +6,31 @@ export class Transaction {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
-    type: string
+    @Column({nullable: true})
+    category: string
     
-    @Column()
+    @Column({nullable: true})
+    category_id: string
+    
+    @Column({nullable: true})
+    class: string
+    
+    @Column({nullable: true})
     amount: number
+
+    @Column({type: 'longtext',nullable: true})
+    account: string
     
-    @Column()
+    @Column({type: 'longtext',nullable: true})
+    direction: string
+    
+    @Column({type: 'longtext',nullable: true})
+    description: string
+    
+    @Column({type: 'longtext',nullable: true})
+    postDate: string
+    
+    @Column({nullable: true})
     flag: string
 
     @ManyToOne(() => User, user => user.transactions)

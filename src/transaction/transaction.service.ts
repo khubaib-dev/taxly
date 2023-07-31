@@ -37,8 +37,14 @@ export class TransactionService {
       if(checkChart.length > 0) flag = 1
       else flag = 0
       const newTransaction = new Transaction()
-      newTransaction.type = category
+      newTransaction.category = category
+      newTransaction.category_id = transaction.subClass.code
       newTransaction.amount = transaction.amount
+      newTransaction.class = transaction.class
+      newTransaction.account = transaction.account
+      newTransaction.direction = transaction.direction
+      newTransaction.description = transaction.description
+      newTransaction.postDate = transaction.postDate
       newTransaction.flag = flag
       newTransaction.userId = userId
       return this.transactionRepository.save(newTransaction)
