@@ -1,5 +1,5 @@
 import { Controller, Get, Post,
-  UseGuards, Req, Res, Request } from '@nestjs/common';
+  UseGuards, Req, Res, Request } from '@nestjs/common'
 import { SettingService } from './setting.service';
 import { UpdateSettingDto } from './dto/update-setting.dto'
 import { plainToClass } from 'class-transformer';

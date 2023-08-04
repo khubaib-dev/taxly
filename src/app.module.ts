@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { ApiService } from './api/api.service';
+import { AichatService } from './aichat/aichat.service'
+import { Aichat } from './aichat/entities/aichat.entity'
 import { GlobalVariableContainer } from '../global-variables'
 import { VerificationModule } from './verification/verification.module';
 import { SettingModule } from './setting/setting.module';
@@ -15,12 +17,15 @@ import {Transaction} from './transaction/entities/transaction.entity'
 import { TransactionModule } from './transaction/transaction.module'
 import { ChartOfAccount } from './chart-of-account/entities/chart-of-account.entity'
 import { ChartOfAccountModule } from './chart-of-account/chart-of-account.module'
+import { ApiController } from './api/api.controller';
+import { AichatModule } from './aichat/aichat.module';
 
 
 @Module({
   
-  controllers: [AppController],
-  providers: [AppService, ApiService, GlobalVariableContainer],
+  controllers: [AppController, ApiController],
+  providers: [AppService, ApiService, GlobalVariableContainer, AichatService],
+  exports: [ApiService],
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
@@ -33,13 +38,14 @@ import { ChartOfAccountModule } from './chart-of-account/chart-of-account.module
       autoLoadEntities: true,
       synchronize: true, // set to false in production
     }),
-    TypeOrmModule.forFeature([User, Setting, Transaction, ChartOfAccount]),
+    TypeOrmModule.forFeature([User, Setting, Transaction, ChartOfAccount, Aichat]),
     UserModule,
     AuthModule,
     VerificationModule,
     SettingModule,
     TransactionModule,
-    ChartOfAccountModule
+    ChartOfAccountModule,
+    AichatModule
     ],
 })
 export class AppModule {}

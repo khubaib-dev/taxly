@@ -12,10 +12,12 @@ import { VerificationService } from '../verification/verification.service'
 import { PassportModule } from '@nestjs/passport'
 import { JwtModule, JwtService } from '@nestjs/jwt'
 import { Setting } from '../setting/entities/setting.entity'
+import { AichatService } from '../aichat/aichat.service'
+import { Aichat } from '../aichat/entities/aichat.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User,Setting]),
+    TypeOrmModule.forFeature([User,Setting,Aichat]),
     TypeOrmModule.forFeature([Verification]),
     PassportModule,
     JwtModule
@@ -27,7 +29,7 @@ import { Setting } from '../setting/entities/setting.entity'
   ],
   controllers: [AuthController],
   providers: [VerificationService, UserService, AuthService,
-     ApiService, ConfigService, GlobalVariableContainer, JwtService],
+     ApiService, ConfigService, GlobalVariableContainer, JwtService, AichatService],
     exports: [JwtModule],
 })
 export class AuthModule {}

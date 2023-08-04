@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import axios, {AxiosRequestConfig} from 'axios';
 import { GlobalVariableContainer } from '../../global-variables';
 import * as nodemailer from 'nodemailer'
+import { AichatService } from '../aichat/aichat.service'
 // import { MailerService } from '@nestjs-modules/mailer';
 
 
@@ -13,7 +14,9 @@ export class ApiService {
     private transporter: nodemailer.Transporter;  
     
     constructor(private readonly configService: ConfigService,
-      private globalVariableContainer: GlobalVariableContainer) {
+      private globalVariableContainer: GlobalVariableContainer,
+      private readonly aiChatService: AichatService
+      ) {
         this.basiqAPI = process.env.BASIQ_API_KEY;
         this.aMemberAPI = process.env.AMEMBER_API_KEY;
 
@@ -102,6 +105,20 @@ export class ApiService {
         } catch (err) {
           console.error(err);
           throw err;
+        }
+      }
+
+      async getAiResponse(id,query)
+      {
+        this.aiChatService.createChat(id,query.query,query.type)
+
+        //Call AI API below
+        
+        
+        //End of AI API call
+        this.aiChatService.createChat(id,'Response Fetched',false)
+        return {
+          response: 'Response Fetched'
         }
       }
 }
