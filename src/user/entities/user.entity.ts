@@ -15,6 +15,9 @@ export class User {
     @Column({type: 'text'})
     basiq_id: string
 
+    @Column({default: 3})
+    credits: number
+
     @OneToOne(() => Setting, setting => setting.user, { eager: true })
     setting: Setting;
 

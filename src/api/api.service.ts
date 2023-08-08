@@ -113,8 +113,12 @@ export class ApiService {
         this.aiChatService.createChat(id,query.query,query.type)
 
         //Call AI API below
-        
-        
+        // const url = process.env.AI_URI
+        // const config = {
+        //   usecase: 'ChatCall'
+        // }
+        // const response = await axios.post(url, query.query, config);
+        // return response.data
         //End of AI API call
         this.aiChatService.createChat(id,'Response Fetched',false)
         return {
