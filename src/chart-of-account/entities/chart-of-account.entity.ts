@@ -10,7 +10,7 @@ export class ChartOfAccount {
     parent_id: number
 
     @Column({nullable: true})
-    code: number
+    code: string
 
     @Column({type: 'longtext'})
     category: string 

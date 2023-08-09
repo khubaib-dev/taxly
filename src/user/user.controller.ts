@@ -1,16 +1,23 @@
-import { Controller, Get, Post, Body, Patch,
-  UseGuards, Param, Delete, Request } from '@nestjs/common';
+import {
+  Controller, Get, Post, Body, Patch,
+  UseGuards, Param, Delete, Request, Res
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from '../auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { User } from './entities/user.entity'
 
 var bcrypt = require('bcrypt')
 
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>) { }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -26,56 +33,81 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Get('basiq')
-  async findBasiq(@Request() request)
-  {
+  async findBasiq(@Request() request) {
     const userId = request.user.sub
     return await this.userService.basiqUser(userId)
   }
-  
+
   @UseGuards(AuthGuard)
-  @Get('basiqAccounts')
-  async basiqAccounts(@Request() request)
-  {
+  @Get('getUser')
+  async getUser(@Request() request) {
     const userId = request.user.sub
-    return await this.userService.basiqAccounts(userId)
-  }
-  
-  @UseGuards(AuthGuard)
-  @Get('basiqTransactions')
-  async basiqTransactions(@Request() request)
-  {
-    const userId = request.user.sub
-    return await this.userService.basiqTransactions(userId)
-  }
-  
-  @UseGuards(AuthGuard)
-  @Get('checkConsent')
-  async checkConsent(@Request() request)
-  {
-    const userId = request.user.sub
-    return await this.userService.checkConsent(userId)
-  }
-  
-  @UseGuards(AuthGuard)
-  @Post('createConnection')
-  async createConnection(@Request() request,@Body() body: { loginId: string; password: string; institution:  string  }) {
-    const userId = request.user.sub
-    return await this.userService.createConnection(userId,body)
+    return await this.userService.findOne(userId)
   }
 
+  @UseGuards(AuthGuard)
+  @Get('updateCreadits')
+  async updateCreadits(@Request() request, @Res() res) {
+    const id = request.user.sub
+    const user = await this.userRepository.findOne({
+      where: {
+        id
+      },
+    });
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
+    user.credits = (user.credits - 1)
+    await this.userRepository.save(user)
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
+    return res.status(200).json({
+      status: 200,
+      ok: true,
+    })
+}
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
+@UseGuards(AuthGuard)
+@Get('basiqAccounts')
+async basiqAccounts(@Request() request)
+{
+  const userId = request.user.sub
+  return await this.userService.basiqAccounts(userId)
+}
+
+@UseGuards(AuthGuard)
+@Get('basiqTransactions')
+async basiqTransactions(@Request() request)
+{
+  const userId = request.user.sub
+  return await this.userService.basiqTransactions(userId)
+}
+
+@UseGuards(AuthGuard)
+@Get('checkConsent')
+async checkConsent(@Request() request)
+{
+  const userId = request.user.sub
+  return await this.userService.checkConsent(userId)
+}
+
+@UseGuards(AuthGuard)
+@Post('createConnection')
+async createConnection(@Request() request, @Body() body: { loginId: string; password: string; institution: string }) {
+  const userId = request.user.sub
+  return await this.userService.createConnection(userId, body)
+}
+
+
+@Get(':id')
+findOne(@Param('id') id: string) {
+  return this.userService.findOne(+id);
+}
+
+@Patch(':id')
+update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  return this.userService.update(+id, updateUserDto);
+}
+
+@Delete(':id')
+remove(@Param('id') id: string) {
+  return this.userService.remove(+id);
+}
 }
