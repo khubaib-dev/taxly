@@ -10,10 +10,10 @@ import { ChartOfAccount } from '../chart-of-account/entities/chart-of-account.en
 export class TransactionService {
   constructor(
     @InjectRepository(Transaction)
-      private readonly transactionRepository: Repository<Transaction>,
-      @InjectRepository(ChartOfAccount)
-      private readonly chartOfAccountRepository: Repository<ChartOfAccount>
-    ) {}
+    private readonly transactionRepository: Repository<Transaction>,
+    @InjectRepository(ChartOfAccount)
+    private readonly chartOfAccountRepository: Repository<ChartOfAccount>
+  ) { }
 
   create(createTransactionDto: CreateTransactionDto) {
     return 'This action adds a new transaction';
@@ -23,31 +23,47 @@ export class TransactionService {
     return `This action returns all transaction`;
   }
 
-  findByCat(cat)
-  {
-    return this.chartOfAccountRepository.find({where: {category: cat}})
+  findByCat(code) {
+    return this.chartOfAccountRepository.findOne({ where: { code } })
+  }
+  
+  findByTransaction(transaction_id) {
+    return this.transactionRepository.findOne({ where: { transaction_id } });
   }
 
-  async createTransactions(userId,transactions)
-  {
-    var flag
-    return transactions.map(async (transaction) => {
-      var category = transaction.subClass.title
-      const checkChart = await this.findByCat(category)
-      if(checkChart.length > 0) flag = 1
-      else flag = 0
-      const newTransaction = new Transaction()
-      newTransaction.category = category
-      newTransaction.category_id = transaction.subClass.code
-      newTransaction.amount = transaction.amount
-      newTransaction.class = transaction.class
-      newTransaction.account = transaction.account
-      newTransaction.direction = transaction.direction
-      newTransaction.description = transaction.description
-      newTransaction.postDate = transaction.postDate
-      newTransaction.flag = flag
-      newTransaction.userId = userId
-      return this.transactionRepository.save(newTransaction)
+  async createTransactions(userId, transactions) {
+    var flag = 0;
+    for (const transaction of transactions) {
+      var category = transaction.subClass.title;
+      var code = transaction.subClass.code;
+      const checkChart = await this.findByCat(code);
+      if (checkChart) {
+        flag = 1
+      } else {
+        flag = 0
+      }
+      const transactionCheck = await this.findByTransaction(transaction.id)
+      if (!transactionCheck) {
+        const newTransaction = new Transaction();
+        newTransaction.category = category;
+        newTransaction.category_id = code;
+        newTransaction.amount = transaction.amount;
+        newTransaction.class = transaction.class;
+        newTransaction.account = transaction.account;
+        newTransaction.direction = transaction.direction;
+        newTransaction.description = transaction.description;
+        newTransaction.postDate = transaction.postDate;
+        newTransaction.flag_coa = flag;
+        newTransaction.userId = userId;
+        newTransaction.transaction_id = transaction.id;
+        await this.transactionRepository.save(newTransaction);
+      }
+    }
+    return await this.transactionRepository.find({
+      where: {
+        userId: userId,
+        flag_coa: 0
+      }
     })
   }
 

@@ -31,7 +31,13 @@ export class Transaction {
     postDate: string
     
     @Column({nullable: true})
-    flag: string
+    flag_coa: number
+    
+    @Column({nullable: true})
+    flag_deduction: number
+    
+    @Column({type: 'longtext',nullable: true})
+    transaction_id: string
 
     @ManyToOne(() => User, user => user.transactions)
     user: User;
