@@ -32,37 +32,49 @@ export class TransactionService {
   }
 
   async createTransactions(userId, transactions) {
-    var flag = 0;
+    const deduction = ['391','411','111']
+    var flag_coa = 0
+    var flag_deduction = 0
     for (const transaction of transactions) {
       var category = transaction.subClass.title;
       var code = transaction.subClass.code;
       const checkChart = await this.findByCat(code);
       if (checkChart) {
-        flag = 1
+        flag_coa = 1
       } else {
-        flag = 0
+        flag_coa = 0
+      }
+
+      if(deduction.includes(code))
+      {
+        flag_deduction = 1
+      }
+      else
+      {
+        flag_deduction = 0
       }
       const transactionCheck = await this.findByTransaction(transaction.id)
       if (!transactionCheck) {
-        const newTransaction = new Transaction();
-        newTransaction.category = category;
-        newTransaction.category_id = code;
-        newTransaction.amount = transaction.amount;
-        newTransaction.class = transaction.class;
-        newTransaction.account = transaction.account;
-        newTransaction.direction = transaction.direction;
-        newTransaction.description = transaction.description;
-        newTransaction.postDate = transaction.postDate;
-        newTransaction.flag_coa = flag;
-        newTransaction.userId = userId;
-        newTransaction.transaction_id = transaction.id;
-        await this.transactionRepository.save(newTransaction);
+        const newTransaction = new Transaction()
+        newTransaction.category = category
+        newTransaction.category_id = code
+        newTransaction.amount = transaction.amount
+        newTransaction.class = transaction.class
+        newTransaction.account = transaction.account
+        newTransaction.direction = transaction.direction
+        newTransaction.description = transaction.description
+        newTransaction.postDate = transaction.postDate
+        newTransaction.flag_coa = flag_coa
+        newTransaction.flag_deduction = flag_deduction
+        newTransaction.userId = userId
+        newTransaction.transaction_id = transaction.id
+        await this.transactionRepository.save(newTransaction)
       }
     }
     return await this.transactionRepository.find({
       where: {
         userId: userId,
-        flag_coa: 0
+        flag_deduction: 1
       }
     })
   }
