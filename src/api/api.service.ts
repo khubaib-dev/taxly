@@ -5,6 +5,9 @@ import { GlobalVariableContainer } from '../../global-variables';
 import * as nodemailer from 'nodemailer'
 import { AichatService } from '../aichat/aichat.service'
 // import { MailerService } from '@nestjs-modules/mailer';
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { User } from '../user/entities/user.entity'
 
 
 @Injectable()
@@ -15,7 +18,9 @@ export class ApiService {
     
     constructor(private readonly configService: ConfigService,
       private globalVariableContainer: GlobalVariableContainer,
-      private readonly aiChatService: AichatService
+      private readonly aiChatService: AichatService,
+      @InjectRepository(User)
+        private readonly userRepository: Repository<User>
       ) {
         this.basiqAPI = process.env.BASIQ_API_KEY;
         this.aMemberAPI = process.env.AMEMBER_API_KEY;
@@ -124,5 +129,26 @@ export class ApiService {
         return {
           response: 'Response Fetched'
         }
+      }
+
+      async getAllUsers()
+      {
+        const users = await this.userRepository.find()
+        const aMemberKey = process.env.AMEMBER_API_KEY
+        
+        const url = 'https://backend.taxly.ai/api/check-access/by-login';
+        
+        for (const user of users) {
+          const payloadAccess = {
+            params: {
+            _key: aMemberKey,
+            login: user.amember_id
+            }}
+
+            const fullUser = await axios.get(url,payloadAccess)
+
+          user['aMember'] = fullUser.data
+        }
+        return users
       }
 }

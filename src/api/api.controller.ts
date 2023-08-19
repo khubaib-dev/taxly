@@ -4,18 +4,16 @@ import {
 } from '@nestjs/common'
 import { ApiService } from './api.service'
 import { AuthGuard } from '../auth/auth.guard'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { User } from '../user/entities/user.entity'
+
 
 
 @Controller('api')
 export class ApiController {
-
     constructor(
         private readonly apiService: ApiService,
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>) { }
+
+        ) 
+        { }
 
     @UseGuards(AuthGuard)
     @Post('AiHelp')
@@ -43,5 +41,26 @@ export class ApiController {
                 });
             });
 
+    }
+
+    @Get('users')
+    async getAllUsers(@Res() res)
+    {
+        await this.apiService.getAllUsers()
+        .then(data => {
+            return res.status(200).json({
+              status: 200,
+              code: 'ok',
+              data,
+            });
+          })
+          .catch(error => {
+            // Handle error
+            return res.status(500).json({
+              status: 500,
+              code: 'error',
+              message: error,
+            });
+          });
     }
 }

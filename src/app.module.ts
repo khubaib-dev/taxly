@@ -19,6 +19,7 @@ import { ChartOfAccount } from './chart-of-account/entities/chart-of-account.ent
 import { ChartOfAccountModule } from './chart-of-account/chart-of-account.module'
 import { ApiController } from './api/api.controller';
 import { AichatModule } from './aichat/aichat.module';
+import { CriteriaModule } from './criteria/criteria.module';
 
 
 @Module({
@@ -45,7 +46,8 @@ import { AichatModule } from './aichat/aichat.module';
     SettingModule,
     TransactionModule,
     ChartOfAccountModule,
-    AichatModule
+    AichatModule,
+    CriteriaModule
     ],
 })
 export class AppModule {}
