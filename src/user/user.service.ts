@@ -270,4 +270,27 @@ export class UserService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
+
+  async getAMemberUser(id)
+  {
+    const apiKey = process.env.AMEMBER_API_KEY
+    const base_url = process.env.AMEMBER_BASEURL
+    const user = await this.userRepository.findOne({ where: { id } })
+    const payloadAccess = {
+      params: {
+      _key: apiKey,
+      login:user.amember_id
+    }}
+    
+    try {
+      const aMemberUser = await axios.get(`${base_url}/check-access/by-login`,payloadAccess)
+      return {
+        ok: true,
+        user: aMemberUser.data
+      }
+    } catch (error) {
+        console.log(error)
+    }
+    
+  }
 }

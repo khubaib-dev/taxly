@@ -30,6 +30,27 @@ export class UserController {
     const userId = request.user.sub
     return this.userService.findAll()
   }
+  
+  @UseGuards(AuthGuard)
+  @Get('checkAuth')
+  async checkAuth(@Request() request, @Res() res) {
+    const userId = request.user.sub
+    await this.userService.getAMemberUser(userId)
+    .then(data => {
+      return res.status(200).json({
+        status: 200,
+        ok: true,
+        data,
+      });
+    })
+    .catch(error => {
+      return res.status(200).json({
+        status: 500,
+        ok: false,
+        message: error,
+      });
+    });
+  }
 
   @UseGuards(AuthGuard)
   @Get('basiq')

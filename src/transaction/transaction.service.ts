@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Transaction } from './entities/transaction.entity'
 import { ChartOfAccount } from '../chart-of-account/entities/chart-of-account.entity'
+import { Criterion } from '../criteria/entities/criterion.entity'
 
 @Injectable()
 export class TransactionService {
@@ -12,7 +13,9 @@ export class TransactionService {
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
     @InjectRepository(ChartOfAccount)
-    private readonly chartOfAccountRepository: Repository<ChartOfAccount>
+    private readonly chartOfAccountRepository: Repository<ChartOfAccount>,
+    @InjectRepository(Criterion)
+    private readonly criteriaRepository: Repository<Criterion>,
   ) { }
 
   create(createTransactionDto: CreateTransactionDto) {
@@ -32,12 +35,21 @@ export class TransactionService {
   }
 
   async createTransactions(userId, transactions) {
-    const deduction = ['391','411','111']
+    const criterias = await this.criteriaRepository.find()
+    const deduction = []
+    for (const criteria of criterias)
+    {
+      const array = JSON.parse(criteria.values)
+      array.map((element) => {
+        deduction.push(element)
+      })
+    }
+    console.log(deduction)
     var flag_coa = 0
     var flag_deduction = 0
     for (const transaction of transactions) {
-      var category = transaction.subClass.title;
-      var code = transaction.subClass.code;
+      var category = transaction.subClass ? transaction.subClass.title : 'unKnown';
+      var code = transaction.subClass ? transaction.subClass.code : 0;
       const checkChart = await this.findByCat(code);
       if (checkChart) {
         flag_coa = 1
@@ -45,6 +57,7 @@ export class TransactionService {
         flag_coa = 0
       }
 
+      console.log(code)
       if(deduction.includes(code))
       {
         flag_deduction = 1
