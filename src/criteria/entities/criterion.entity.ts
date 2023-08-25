@@ -9,5 +9,11 @@ export class Criterion {
     name: string
 
     @Column({ type: 'longtext' })
+    occupation: string
+
+    @Column({ type: 'longtext' })
+    user_type: string
+
+    @Column({ type: 'longtext' })
     values: string
 }
