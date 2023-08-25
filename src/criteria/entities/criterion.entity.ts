@@ -8,12 +8,12 @@ export class Criterion {
     @Column()
     name: string
 
-    @Column({ type: 'longtext' })
+    @Column({nullable: true, type: 'longtext'})
     occupation: string
 
-    @Column({ type: 'longtext' })
+    @Column({nullable: true, type: 'longtext'})
     user_type: string
 
-    @Column({ type: 'longtext' })
+    @Column({nullable: true, type: 'longtext'})
     values: string
 }
