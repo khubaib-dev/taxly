@@ -116,6 +116,13 @@ async createConnection(@Request() request, @Body() body: { loginId: string; pass
   return await this.userService.createConnection(userId, body)
 }
 
+@UseGuards(AuthGuard)
+@Get('getDeduction')
+async getDeduction(@Request() request) {
+  const userId = request.user.sub
+  return await this.userService.getDeduction(userId)
+}
+
 
 @Get(':id')
 findOne(@Param('id') id: string) {

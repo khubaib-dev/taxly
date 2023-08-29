@@ -5,7 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity'
 import { Setting } from '../setting/entities/setting.entity'
+import { Criterion } from '../criteria/entities/criterion.entity'
 import axios, {AxiosRequestConfig} from 'axios'
+import { Occupation } from '../occupation/entities/occupation.entity'
 import * as qs from 'qs';
 
 @Injectable()
@@ -17,6 +19,11 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Setting)
     private readonly settingRepository: Repository<Setting>,
+    @InjectRepository(Criterion)
+    private readonly criteriaRepository: Repository<Criterion>,
+    @InjectRepository(Occupation)
+    private readonly occupationRepository: Repository<Occupation>,
+    
   ) {
     this.basiqAPI = process.env.BASIQ_API_KEY;
   }
@@ -99,6 +106,40 @@ export class UserService {
           data: error
         }
       });
+  }
+
+  async getDeduction(id)
+  {
+    const user = await this.userRepository.findOne({ where: { id } })
+    const setting = user.setting
+    const parseData = JSON.parse(setting.work_status);
+
+    const occupation = await this.occupationRepository.find()
+
+    var workStatus
+    if(parseData.selfEmployed || parseData.salaryedEmployee)
+    {
+        workStatus = 'Individual'
+    }
+    else{
+      workStatus = 'Business'
+    }
+
+    const criterias = await this.criteriaRepository.find({ where: {
+      user_type: workStatus
+    }})
+
+    var deduction = 0
+    for(const criteria of criterias)
+    {
+      const data = JSON.parse(criteria.values);
+      deduction += data.length
+    }
+
+    return {
+      ok: true,
+      deductions : deduction
+    }
   }
 
   async basiqUser(id)

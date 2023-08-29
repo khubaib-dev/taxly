@@ -14,10 +14,12 @@ import { JwtModule, JwtService } from '@nestjs/jwt'
 import { Setting } from '../setting/entities/setting.entity'
 import { AichatService } from '../aichat/aichat.service'
 import { Aichat } from '../aichat/entities/aichat.entity'
+import { Criterion } from '../criteria/entities/criterion.entity'
+import { Occupation } from '../occupation/entities/occupation.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User,Setting,Aichat]),
+    TypeOrmModule.forFeature([User,Setting,Aichat,Criterion,Occupation]),
     TypeOrmModule.forFeature([Verification]),
     PassportModule,
     JwtModule

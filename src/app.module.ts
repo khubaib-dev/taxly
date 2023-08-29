@@ -20,6 +20,7 @@ import { ChartOfAccountModule } from './chart-of-account/chart-of-account.module
 import { ApiController } from './api/api.controller';
 import { AichatModule } from './aichat/aichat.module';
 import { CriteriaModule } from './criteria/criteria.module';
+import { OccupationModule } from './occupation/occupation.module';
 
 
 @Module({
@@ -47,7 +48,8 @@ import { CriteriaModule } from './criteria/criteria.module';
     TransactionModule,
     ChartOfAccountModule,
     AichatModule,
-    CriteriaModule
+    CriteriaModule,
+    OccupationModule
     ],
 })
 export class AppModule {}
