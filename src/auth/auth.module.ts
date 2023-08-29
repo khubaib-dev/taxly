@@ -16,11 +16,13 @@ import { AichatService } from '../aichat/aichat.service'
 import { Aichat } from '../aichat/entities/aichat.entity'
 import { Criterion } from '../criteria/entities/criterion.entity'
 import { Occupation } from '../occupation/entities/occupation.entity'
+import { UserType } from '../user-type/entities/user-type.entity'
+import { Profession } from '../profession/entities/profession.entity'
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User,Setting,Aichat,Criterion,Occupation]),
-    TypeOrmModule.forFeature([Verification]),
+    TypeOrmModule.forFeature([Profession,UserType,Verification]),
     PassportModule,
     JwtModule
     // JwtModule.register({

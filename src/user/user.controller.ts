@@ -102,6 +102,22 @@ async basiqTransactions(@Request() request)
 }
 
 @UseGuards(AuthGuard)
+@Get('getUserTypes')
+async getUserTypes(@Request() request)
+{
+  const userId = request.user.sub
+  return await this.userService.getUserTypes(userId)
+}
+
+@UseGuards(AuthGuard)
+@Get('getProfessions')
+async getProfessions(@Request() request)
+{
+  const userId = request.user.sub
+  return await this.userService.getProfessions(userId)
+}
+
+@UseGuards(AuthGuard)
 @Get('checkConsent')
 async checkConsent(@Request() request)
 {

@@ -7,9 +7,11 @@ import { JwtService } from '@nestjs/jwt'
 import { Setting } from '../setting/entities/setting.entity'
 import { Criterion } from '../criteria/entities/criterion.entity'
 import { Occupation } from '../occupation/entities/occupation.entity'
+import { UserType } from '../user-type/entities/user-type.entity'
+import { Profession } from '../profession/entities/profession.entity'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Setting, Criterion, Occupation])],
+  imports: [TypeOrmModule.forFeature([Profession, UserType, User, Setting, Criterion, Occupation])],
   controllers: [UserController],
   providers: [UserService, JwtService],
   exports: [UserService],

@@ -21,6 +21,8 @@ import { ApiController } from './api/api.controller';
 import { AichatModule } from './aichat/aichat.module';
 import { CriteriaModule } from './criteria/criteria.module';
 import { OccupationModule } from './occupation/occupation.module';
+import { UserTypeModule } from './user-type/user-type.module';
+import { ProfessionModule } from './profession/profession.module';
 
 
 @Module({
@@ -49,7 +51,9 @@ import { OccupationModule } from './occupation/occupation.module';
     ChartOfAccountModule,
     AichatModule,
     CriteriaModule,
-    OccupationModule
+    OccupationModule,
+    UserTypeModule,
+    ProfessionModule
     ],
 })
 export class AppModule {}

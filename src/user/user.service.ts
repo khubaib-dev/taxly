@@ -8,6 +8,8 @@ import { Setting } from '../setting/entities/setting.entity'
 import { Criterion } from '../criteria/entities/criterion.entity'
 import axios, {AxiosRequestConfig} from 'axios'
 import { Occupation } from '../occupation/entities/occupation.entity'
+import { UserType } from '../user-type/entities/user-type.entity'
+import { Profession } from '../profession/entities/profession.entity'
 import * as qs from 'qs';
 
 @Injectable()
@@ -23,6 +25,10 @@ export class UserService {
     private readonly criteriaRepository: Repository<Criterion>,
     @InjectRepository(Occupation)
     private readonly occupationRepository: Repository<Occupation>,
+    @InjectRepository(UserType)
+    private readonly userTypeRepository: Repository<UserType>,
+    @InjectRepository(Profession)
+    private readonly professionRepository: Repository<Profession>,
     
   ) {
     this.basiqAPI = process.env.BASIQ_API_KEY;
@@ -106,6 +112,32 @@ export class UserService {
           data: error
         }
       });
+  }
+
+  async getUserTypes(id)
+  {
+    const user = await this.userRepository.findOne({ where: { id } })
+    const setting = user.setting
+
+    const userTypes = await this.userTypeRepository.find()
+    return {
+      ok: true,
+      userTypes : userTypes,
+      setting: setting
+    }
+  }
+  
+  async getProfessions(id)
+  {
+    const user = await this.userRepository.findOne({ where: { id } })
+    const setting = user.setting
+
+    const professions = await this.professionRepository.find()
+    return {
+      ok: true,
+      professions : professions,
+      setting: setting
+    }
   }
 
   async getDeduction(id)
