@@ -32,6 +32,9 @@ export class Setting {
     
     @Column({nullable: true, type: 'longtext'})
     profession: string
+    
+    @Column({nullable: true, type: 'longtext'})
+    criteria: string
 
     @Column({nullable: true})
     work_type: boolean

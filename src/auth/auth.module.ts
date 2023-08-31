@@ -18,11 +18,13 @@ import { Criterion } from '../criteria/entities/criterion.entity'
 import { Occupation } from '../occupation/entities/occupation.entity'
 import { UserType } from '../user-type/entities/user-type.entity'
 import { Profession } from '../profession/entities/profession.entity'
+import { OnBoarding } from '../on-boarding/entities/on-boarding.entity'
+import { OnBoardingQuestion } from '../on-boarding/entities/on-boarding-question.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User,Setting,Aichat,Criterion,Occupation]),
-    TypeOrmModule.forFeature([Profession,UserType,Verification]),
+    TypeOrmModule.forFeature([OnBoardingQuestion, User,Setting,Aichat,Criterion,Occupation]),
+    TypeOrmModule.forFeature([OnBoarding, Profession,UserType,Verification]),
     PassportModule,
     JwtModule
     // JwtModule.register({

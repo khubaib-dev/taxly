@@ -118,6 +118,22 @@ async getProfessions(@Request() request)
 }
 
 @UseGuards(AuthGuard)
+@Get('getOnBoarding')
+async getOnBoarding(@Request() request)
+{
+  const userId = request.user.sub
+  return await this.userService.getOnBoarding(userId)
+}
+
+@UseGuards(AuthGuard)
+@Post('updateCriteria')
+async updateCriteria(@Request() request)
+{
+  const userId = request.user.sub
+  return await this.userService.updateCriteria(userId,request.body)
+}
+
+@UseGuards(AuthGuard)
 @Get('checkConsent')
 async checkConsent(@Request() request)
 {

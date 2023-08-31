@@ -10,6 +10,8 @@ import axios, {AxiosRequestConfig} from 'axios'
 import { Occupation } from '../occupation/entities/occupation.entity'
 import { UserType } from '../user-type/entities/user-type.entity'
 import { Profession } from '../profession/entities/profession.entity'
+import { OnBoarding } from '../on-boarding/entities/on-boarding.entity'
+import { OnBoardingQuestion } from '../on-boarding/entities/on-boarding-question.entity'
 import * as qs from 'qs';
 
 @Injectable()
@@ -19,6 +21,10 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(OnBoarding)
+    private readonly onBoardingRepository: Repository<OnBoarding>,
+    @InjectRepository(OnBoardingQuestion)
+    private readonly onBoardingQuestionRepository: Repository<OnBoardingQuestion>,
     @InjectRepository(Setting)
     private readonly settingRepository: Repository<Setting>,
     @InjectRepository(Criterion)
@@ -138,6 +144,67 @@ export class UserService {
       professions : professions,
       setting: setting
     }
+  }
+
+  async updateCriteria(id,request)
+  {
+    const question = await this.onBoardingQuestionRepository.findOne({where:{
+      id: request.question},
+      relations: ['on_boarding_id']
+    })
+    
+    const dbOnBoarding = await this.onBoardingRepository.findOne({where: { id: question.on_boarding_id.id }
+    })
+
+    const criteria = await this.criteriaRepository.findOne({where: {
+      id:dbOnBoarding.criteria_id
+    }})
+
+    const updatedCriteria = []
+    
+    var user = await this.userRepository.findOne({where:{ id }})
+    
+    var setting = user.setting
+
+    if(setting.criteria != null)
+    {
+      JSON.parse(setting.criteria).map((criteria) => {
+        updatedCriteria.push(criteria)
+      })
+    }
+
+    const values = JSON.parse(criteria.values)
+    values.map((value) => {
+      updatedCriteria.push(value)
+    })
+    
+    const updatedUser = await this.settingRepository.update(setting.id, {criteria: JSON.stringify(updatedCriteria)})
+
+    return {
+      ok: true
+    }
+  }
+  
+  async getOnBoarding(id)
+  {
+    const user = await this.userRepository.findOne({ where: { id } })
+    const setting = user.setting
+
+    const profession_id = Number(setting.profession)
+    const profession = await this.professionRepository.findOne({ where: {id:profession_id } })
+    const occupation_id = profession.occupation_id
+
+    const onBoardings = await this.onBoardingRepository.find({where: [
+      { occupation_id: occupation_id },
+      { profession_id: profession_id }
+    ]})
+
+    return {
+      ok: true,
+      onBoardings:onBoardings
+    }
+
+    
   }
 
   async getDeduction(id)

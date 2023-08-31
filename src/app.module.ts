@@ -23,6 +23,7 @@ import { CriteriaModule } from './criteria/criteria.module';
 import { OccupationModule } from './occupation/occupation.module';
 import { UserTypeModule } from './user-type/user-type.module';
 import { ProfessionModule } from './profession/profession.module';
+import { OnBoardingModule } from './on-boarding/on-boarding.module';
 
 
 @Module({
@@ -53,7 +54,8 @@ import { ProfessionModule } from './profession/profession.module';
     CriteriaModule,
     OccupationModule,
     UserTypeModule,
-    ProfessionModule
+    ProfessionModule,
+    OnBoardingModule
     ],
 })
 export class AppModule {}
