@@ -4,6 +4,9 @@ import { User } from '../user/entities/user.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { UpdateSettingDto } from './dto/update-setting.dto'
+import { Criterion } from '../criteria/entities/criterion.entity'
+import { UserType } from '../user-type/entities/user-type.entity'
+import { Profession } from '../profession/entities/profession.entity'
 
 @Injectable()
 export class SettingService {
@@ -12,7 +15,13 @@ export class SettingService {
   @InjectRepository(Setting)
     private readonly settingRepository: Repository<Setting>,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Criterion)
+    private readonly criteriaRepository: Repository<Criterion>,
+    @InjectRepository(UserType)
+    private readonly userTypeRepository: Repository<UserType>,
+    @InjectRepository(Profession)
+    private readonly professionRepository: Repository<Profession>,
   ) {}
 
   async update(id, request){
@@ -22,18 +31,66 @@ export class SettingService {
 
     var setting = user.setting
 
-    if (!setting) {
-      throw new Error('User not found');
-    }
-
     // Update seting
     const updatedUser = await this.settingRepository.update(setting.id, request);
 
+    this.updateCriteria(id)
     user = await this.userRepository.findOne({where:{ id }})
 
     setting = user.setting
     
     return setting;
+  }
+
+  async updateCriteria(id)
+  {
+    var user = await this.userRepository.findOne({where:{ id }})
+
+    var setting = user.setting
+
+    if(setting.work_status != null)
+    {
+      const userType = await this.userTypeRepository.findOne({where:{
+        id: JSON.parse(setting.work_status)
+      }})
+  
+      const criterias = await this.criteriaRepository.find({where:{user_type : userType.name}})
+  
+      const updatedCriteria = []
+      if(setting.criteria != null)
+      {
+        const values = JSON.parse(setting.criteria)
+        values.map((value) => {
+          if (!updatedCriteria.includes(value)) {
+            updatedCriteria.push(value)
+          }
+        })
+      }
+  
+      criterias.map((criteria) => {
+        const values = JSON.parse(criteria.values)
+        values.map((value) => {
+          if (!updatedCriteria.includes(value)) {
+            updatedCriteria.push(value)
+          }
+        })
+        })
+        await this.settingRepository.update(setting.id, {criteria: JSON.stringify(updatedCriteria)})
+    }
+    
+
+      if(setting.profession != null)
+      {
+        const profession = await this.professionRepository.findOne({where: {
+          id: JSON.parse(setting.profession)
+        }})
+
+        // const criteria = await this.criteriaRepository.
+        // console.log(profession)
+
+      }
+
+      
   }
 
 }

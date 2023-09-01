@@ -222,29 +222,10 @@ export class UserService {
   {
     const user = await this.userRepository.findOne({ where: { id } })
     const setting = user.setting
-    const parseData = JSON.parse(setting.work_status);
-
-    const occupation = await this.occupationRepository.find()
-
-    var workStatus
-    if(parseData.selfEmployed || parseData.salaryedEmployee)
-    {
-        workStatus = 'Individual'
-    }
-    else{
-      workStatus = 'Business'
-    }
-
-    const criterias = await this.criteriaRepository.find({ where: {
-      user_type: workStatus
-    }})
 
     var deduction = 0
-    for(const criteria of criterias)
-    {
-      const data = JSON.parse(criteria.values);
-      deduction += data.length
-    }
+      const data = JSON.parse(setting.criteria)
+      if(data != null) deduction += data.length
 
     return {
       ok: true,

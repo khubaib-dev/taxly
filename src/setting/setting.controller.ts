@@ -11,6 +11,14 @@ export class SettingController {
   constructor(private readonly settingService: SettingService) {}
 
   @UseGuards(AuthGuard)
+  @Get('updateCriteria')
+  async updateCriteria(@Request() request)
+  {
+    const id = request.user.sub
+    const criteria = await this.settingService.updateCriteria(id)
+  }
+
+  @UseGuards(AuthGuard)
   @Post('update')
   async update(@Request() request, @Res() res) {
     const setting = request.body
