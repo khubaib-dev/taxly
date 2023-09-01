@@ -152,36 +152,47 @@ export class UserService {
       id: request.question},
       relations: ['on_boarding_id']
     })
-    
-    const dbOnBoarding = await this.onBoardingRepository.findOne({where: { id: question.on_boarding_id.id }
-    })
-
-    const criteria = await this.criteriaRepository.findOne({where: {
-      id:dbOnBoarding.criteria_id
-    }})
-
-    const updatedCriteria = []
-    
-    var user = await this.userRepository.findOne({where:{ id }})
-    
-    var setting = user.setting
-
-    if(setting.criteria != null)
+    if(question.order == 1)
     {
-      JSON.parse(setting.criteria).map((criteria) => {
-        updatedCriteria.push(criteria)
+      const dbOnBoarding = await this.onBoardingRepository.findOne({where: { id: question.on_boarding_id.id }
       })
+  
+      const criteria = await this.criteriaRepository.findOne({where: {
+        id:dbOnBoarding.criteria_id
+      }})
+  
+      const updatedCriteria = []
+      
+      var user = await this.userRepository.findOne({where:{ id }})
+      
+      var setting = user.setting
+  
+      if(setting.criteria != null)
+      {
+        JSON.parse(setting.criteria).map((criteria) => {
+          if (!updatedCriteria.includes(criteria)) {
+            updatedCriteria.push(criteria)
+          }
+        })
+      }
+  
+      const values = JSON.parse(criteria.values)
+      values.map((value) => {
+        if (!updatedCriteria.includes(value)) {
+          updatedCriteria.push(value)
+        }
+      })
+      
+      const updatedUser = await this.settingRepository.update(setting.id, {criteria: JSON.stringify(updatedCriteria)})
     }
 
-    const values = JSON.parse(criteria.values)
-    values.map((value) => {
-      updatedCriteria.push(value)
-    })
+    var user = await this.userRepository.findOne({where:{ id }})
+      
+    var setting = user.setting
     
-    const updatedUser = await this.settingRepository.update(setting.id, {criteria: JSON.stringify(updatedCriteria)})
-
     return {
-      ok: true
+      ok: true,
+      totalDeduction: JSON.parse(setting.criteria).length
     }
   }
   
