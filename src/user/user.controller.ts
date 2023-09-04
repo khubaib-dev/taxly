@@ -155,6 +155,13 @@ async getDeduction(@Request() request) {
   return await this.userService.getDeduction(userId)
 }
 
+@UseGuards(AuthGuard)
+@Post('userUpdate')
+async userUpdate(@Request() request) {
+  const userId = request.user.sub
+  return await this.userService.userUpdate(userId,request.body)
+}
+
 
 @Get(':id')
 findOne(@Param('id') id: string) {

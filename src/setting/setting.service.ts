@@ -2,7 +2,7 @@ import { Injectable, Body } from '@nestjs/common'
 import { Setting } from './entities/setting.entity'
 import { User } from '../user/entities/user.entity'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { Repository, SelectQueryBuilder } from 'typeorm'
 import { UpdateSettingDto } from './dto/update-setting.dto'
 import { Criterion } from '../criteria/entities/criterion.entity'
 import { UserType } from '../user-type/entities/user-type.entity'
@@ -12,7 +12,7 @@ import { Profession } from '../profession/entities/profession.entity'
 export class SettingService {
 
   constructor(
-  @InjectRepository(Setting)
+    @InjectRepository(Setting)
     private readonly settingRepository: Repository<Setting>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -22,12 +22,12 @@ export class SettingService {
     private readonly userTypeRepository: Repository<UserType>,
     @InjectRepository(Profession)
     private readonly professionRepository: Repository<Profession>,
-  ) {}
+  ) { }
 
-  async update(id, request){
+  async update(id, request) {
     // Find the user by ID
-    
-    var user = await this.userRepository.findOne({where:{ id }})
+
+    var user = await this.userRepository.findOne({ where: { id } })
 
     var setting = user.setting
 
@@ -35,30 +35,29 @@ export class SettingService {
     const updatedUser = await this.settingRepository.update(setting.id, request);
 
     this.updateCriteria(id)
-    user = await this.userRepository.findOne({where:{ id }})
+    user = await this.userRepository.findOne({ where: { id } })
 
     setting = user.setting
-    
+
     return setting;
   }
 
-  async updateCriteria(id)
-  {
-    var user = await this.userRepository.findOne({where:{ id }})
+  async updateCriteria(id) {
+    var user = await this.userRepository.findOne({ where: { id } })
 
     var setting = user.setting
 
-    if(setting.work_status != null)
-    {
-      const userType = await this.userTypeRepository.findOne({where:{
-        id: JSON.parse(setting.work_status)
-      }})
-  
-      const criterias = await this.criteriaRepository.find({where:{user_type : userType.name}})
-  
+    if (setting.work_status != null) {
+      const userType = await this.userTypeRepository.findOne({
+        where: {
+          id: JSON.parse(setting.work_status)
+        }
+      })
+
+      const criterias = await this.criteriaRepository.find({ where: { user_type: userType.name } })
+
       const updatedCriteria = []
-      if(setting.criteria != null)
-      {
+      if (setting.criteria != null) {
         const values = JSON.parse(setting.criteria)
         values.map((value) => {
           if (!updatedCriteria.includes(value)) {
@@ -66,7 +65,7 @@ export class SettingService {
           }
         })
       }
-  
+
       criterias.map((criteria) => {
         const values = JSON.parse(criteria.values)
         values.map((value) => {
@@ -74,23 +73,50 @@ export class SettingService {
             updatedCriteria.push(value)
           }
         })
-        })
-        await this.settingRepository.update(setting.id, {criteria: JSON.stringify(updatedCriteria)})
+      })
+      await this.settingRepository.update(setting.id, { criteria: JSON.stringify(updatedCriteria) })
     }
-    
 
-      if(setting.profession != null)
-      {
-        const profession = await this.professionRepository.findOne({where: {
+
+    if (setting.profession != null) {
+      const profession = await this.professionRepository.findOne({
+        where: {
           id: JSON.parse(setting.profession)
-        }})
+        }
+      })
 
-        // const criteria = await this.criteriaRepository.
-        // console.log(profession)
+      const occupation = profession.occupation_id
 
+      const criterias = await this.criteriaRepository.
+        createQueryBuilder('criterion')
+        .where(`CONCAT(',', criterion.occupation, ',') LIKE :occupation`, {
+          occupation: `%${occupation}%`,
+        })
+        .getMany()
+
+      const updatedCriteriaProfession = []
+      if (setting.criteria != null) {
+        const values = JSON.parse(setting.criteria)
+        values.map((value) => {
+          if (!updatedCriteriaProfession.includes(value)) {
+            updatedCriteriaProfession.push(value)
+          }
+        })
       }
 
-      
+      criterias.map((criteria) => {
+        const values = JSON.parse(criteria.values)
+        values.map((value) => {
+          if (!updatedCriteriaProfession.includes(value)) {
+            updatedCriteriaProfession.push(value)
+          }
+        })
+      })
+      await this.settingRepository.update(setting.id, { criteria: JSON.stringify(updatedCriteriaProfession) })
+
+    }
+
+
   }
 
 }

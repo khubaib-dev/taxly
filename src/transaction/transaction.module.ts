@@ -6,9 +6,10 @@ import { ChartOfAccount } from '../chart-of-account/entities/chart-of-account.en
 import { JwtService } from '@nestjs/jwt'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Criterion } from '../criteria/entities/criterion.entity'
+import { User } from '../user/entities/user.entity'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Transaction, ChartOfAccount, Criterion])],
+  imports: [TypeOrmModule.forFeature([User, Transaction, ChartOfAccount, Criterion])],
   controllers: [TransactionController],
   providers: [TransactionService, JwtService]
 })

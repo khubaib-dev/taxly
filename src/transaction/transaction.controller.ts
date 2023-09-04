@@ -20,6 +20,15 @@ export class TransactionController {
     const userId = request.user.sub
     return await this.transactionService.createTransactions(userId,request.body)
   }
+  
+  @UseGuards(AuthGuard)
+  @Post('updateTransaction')
+  async updateTransaction(@Request() request) {
+    const userId = request.user.sub
+    return await this.transactionService.updateTransaction(userId,request.body)
+  }
+
+
 
   @Get()
   findAll() {

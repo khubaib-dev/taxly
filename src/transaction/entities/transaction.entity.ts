@@ -36,6 +36,9 @@ export class Transaction {
     @Column({nullable: true})
     flag_deduction: number
     
+    @Column({default: 0, comment: '0=no status, 1=Accept, 2=Reject'})
+    deduction: number
+    
     @Column({type: 'longtext',nullable: true})
     transaction_id: string
 

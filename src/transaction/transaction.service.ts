@@ -6,12 +6,15 @@ import { Repository } from 'typeorm'
 import { Transaction } from './entities/transaction.entity'
 import { ChartOfAccount } from '../chart-of-account/entities/chart-of-account.entity'
 import { Criterion } from '../criteria/entities/criterion.entity'
+import { User } from '../user/entities/user.entity'
 
 @Injectable()
 export class TransactionService {
   constructor(
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     @InjectRepository(ChartOfAccount)
     private readonly chartOfAccountRepository: Repository<ChartOfAccount>,
     @InjectRepository(Criterion)
@@ -34,38 +37,38 @@ export class TransactionService {
     return this.transactionRepository.findOne({ where: { transaction_id } });
   }
 
+  async updateTransaction(id,request)
+  {
+    
+  }
+
   async createTransactions(userId, transactions) {
-    const criterias = await this.criteriaRepository.find()
-    const deduction = []
-    for (const criteria of criterias)
-    {
-      const array = JSON.parse(criteria.values)
-      array.map((element) => {
-        deduction.push(element)
-      })
-    }
-    console.log(deduction)
+    const user = await this.userRepository.findOne({ where: { id: userId } })
+    const setting = user.setting
+
+    const deductions = JSON.parse(setting.criteria)
+
     var flag_coa = 0
     var flag_deduction = 0
     for (const transaction of transactions) {
-      var category = transaction.subClass ? transaction.subClass.title : 'unKnown';
-      var code = transaction.subClass ? transaction.subClass.code : 0;
-      const checkChart = await this.findByCat(code);
+      var category = transaction.subClass ? transaction.subClass.title : 'unKnown'
+      var code = transaction.subClass ? transaction.subClass.code : 0
+      const checkChart = await this.findByCat(code)
       if (checkChart) {
         flag_coa = 1
       } else {
         flag_coa = 0
       }
 
-      console.log(code)
-      if(deduction.includes(code))
-      {
-        flag_deduction = 1
+      flag_deduction = 0;
+
+      for (const deduction of deductions) {
+        if (code == deduction) {
+          flag_deduction = 1
+          break
+        }
       }
-      else
-      {
-        flag_deduction = 0
-      }
+
       const transactionCheck = await this.findByTransaction(transaction.id)
       if (!transactionCheck) {
         const newTransaction = new Transaction()
