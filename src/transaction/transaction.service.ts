@@ -39,7 +39,13 @@ export class TransactionService {
 
   async updateTransaction(id,request)
   {
-    
+    const transaction = await this.transactionRepository.findOne({ where: { transaction_id: request.transactionId } })
+    transaction.deduction = request.action
+    await this.transactionRepository.save(transaction)
+
+    return {
+      ok: true
+    }
   }
 
   async createTransactions(userId, transactions) {
@@ -90,7 +96,8 @@ export class TransactionService {
     return await this.transactionRepository.find({
       where: {
         userId: userId,
-        flag_deduction: 1
+        flag_deduction: 1,
+        deduction: 0
       }
     })
   }
