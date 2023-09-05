@@ -115,7 +115,7 @@ export class ApiService {
 
       async getAiResponse(id,query)
       {
-        this.aiChatService.createChat(id,query.query,query.type)
+        this.aiChatService.createChat(id,query.query,query.type,query.transactionId)
 
         //Call AI API below
         // const url = process.env.AI_URI
@@ -125,7 +125,7 @@ export class ApiService {
         // const response = await axios.post(url, query.query, config);
         // return response.data
         //End of AI API call
-        this.aiChatService.createChat(id,'Response Fetched',false)
+        this.aiChatService.createChat(id,'Response Fetched',false,query.transactionId)
         return {
           response: 'Response Fetched'
         }

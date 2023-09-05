@@ -17,6 +17,9 @@ export class User {
 
     @Column({default: 3})
     credits: number
+    
+    @Column({default: 3})
+    tickets: number
 
     @OneToOne(() => Setting, setting => setting.user, { eager: true })
     setting: Setting;

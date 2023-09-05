@@ -76,8 +76,34 @@ export class UserController {
       },
     });
 
-    user.credits = (user.credits - 1)
-    await this.userRepository.save(user)
+    if(user.credits > 0)
+    {
+      user.credits = (user.credits - 1)
+      await this.userRepository.save(user)
+    }
+
+    return res.status(200).json({
+      status: 200,
+      ok: true,
+    })
+}
+  
+
+@UseGuards(AuthGuard)
+  @Get('updateTickets')
+  async updateTickets(@Request() request, @Res() res) {
+    const id = request.user.sub
+    const user = await this.userRepository.findOne({
+      where: {
+        id
+      },
+    });
+
+    if(user.tickets > 0)
+    {
+      user.tickets = (user.tickets - 1)
+      await this.userRepository.save(user)
+    }
 
     return res.status(200).json({
       status: 200,
@@ -110,6 +136,14 @@ async getUserTypes(@Request() request)
 }
 
 @UseGuards(AuthGuard)
+@Get('getNames')
+async getNames(@Request() request)
+{
+  const userId = request.user.sub
+  return await this.userService.getNames(userId)
+}
+
+@UseGuards(AuthGuard)
 @Get('getProfessions')
 async getProfessions(@Request() request)
 {
@@ -132,6 +166,8 @@ async updateCriteria(@Request() request)
   const userId = request.user.sub
   return await this.userService.updateCriteria(userId,request.body)
 }
+
+
 
 @UseGuards(AuthGuard)
 @Get('checkConsent')

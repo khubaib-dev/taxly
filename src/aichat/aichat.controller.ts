@@ -8,12 +8,12 @@ export class AichatController {
   constructor(private readonly aichatService: AichatService) {}
 
   @UseGuards(AuthGuard)
-  @Get('allMessage')
+  @Post('allMessage')
   async getChats(@Request() request, @Res() res)
   {
     const id = request.user.sub
 
-    await this.aichatService.getUserChats(id)
+    await this.aichatService.getUserChats(id,request.body)
     .then(data => {
       return res.status(200).json({
         status: 200,

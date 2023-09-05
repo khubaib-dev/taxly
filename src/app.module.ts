@@ -24,6 +24,7 @@ import { OccupationModule } from './occupation/occupation.module';
 import { UserTypeModule } from './user-type/user-type.module';
 import { ProfessionModule } from './profession/profession.module';
 import { OnBoardingModule } from './on-boarding/on-boarding.module';
+import { SupportTicketModule } from './support-ticket/support-ticket.module';
 
 
 @Module({
@@ -55,7 +56,8 @@ import { OnBoardingModule } from './on-boarding/on-boarding.module';
     OccupationModule,
     UserTypeModule,
     ProfessionModule,
-    OnBoardingModule
+    OnBoardingModule,
+    SupportTicketModule
     ],
 })
 export class AppModule {}

@@ -460,4 +460,24 @@ export class UserService {
     }
 
   }
+  
+  async getNames(id) {
+    const apiKey = process.env.AMEMBER_API_KEY
+    const base_url = process.env.AMEMBER_BASEURL
+    const user = await this.userRepository.findOne({ where: { id } })
+    const payloadAccess = {
+      params: {
+        _key: apiKey,
+        login: user.amember_id
+      }
+    }
+
+      const aMemberUser = await axios.get(`${base_url}/check-access/by-login`, payloadAccess)
+      return {
+        ok: true,
+        first: aMemberUser.data.name_f,
+        last: aMemberUser.data.name_l
+      }
+
+  }
 }
