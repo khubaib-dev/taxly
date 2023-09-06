@@ -21,14 +21,6 @@ export class TransactionService {
     private readonly criteriaRepository: Repository<Criterion>,
   ) { }
 
-  create(createTransactionDto: CreateTransactionDto) {
-    return 'This action adds a new transaction';
-  }
-
-  findAll() {
-    return `This action returns all transaction`;
-  }
-
   findByCat(code) {
     return this.chartOfAccountRepository.findOne({ where: { code } })
   }
@@ -43,8 +35,16 @@ export class TransactionService {
     transaction.deduction = request.action
     await this.transactionRepository.save(transaction)
 
+    const updatedTransactions = await this.transactionRepository.find({
+      where: {
+        userId: id,
+        flag_deduction: 1,
+        deduction: 0
+      }
+    })
     return {
-      ok: true
+      ok: true,
+      transactions: updatedTransactions
     }
   }
 
@@ -102,15 +102,4 @@ export class TransactionService {
     })
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
-  }
-
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
-  }
 }

@@ -31,6 +31,13 @@ export class SettingService {
 
     var setting = user.setting
 
+    if(!setting)
+    {
+      const setting = new Setting()
+      setting.user = id
+      await this.settingRepository.save(setting)
+    }
+
     // Update seting
     const updatedUser = await this.settingRepository.update(setting.id, request);
 
