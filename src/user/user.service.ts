@@ -12,6 +12,7 @@ import { UserType } from '../user-type/entities/user-type.entity'
 import { Profession } from '../profession/entities/profession.entity'
 import { OnBoarding } from '../on-boarding/entities/on-boarding.entity'
 import { OnBoardingQuestion } from '../on-boarding/entities/on-boarding-question.entity'
+import { Transaction } from '../transaction/entities/transaction.entity'
 import * as qs from 'qs';
 
 @Injectable()
@@ -22,6 +23,8 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Transaction)
+    private readonly transactionRepository: Repository<Transaction>,
     @InjectRepository(OnBoarding)
     private readonly onBoardingRepository: Repository<OnBoarding>,
     @InjectRepository(OnBoardingQuestion)
@@ -100,6 +103,66 @@ export class UserService {
     this.settingRepository.save(setting)
 
     return storeUser
+  }
+
+  async dashboard(id)
+  {
+    const user = await this.userRepository.findOne({ where: { id } })
+
+    const transactions = await this.transactionRepository.find({
+      where: {
+        userId: id
+      }
+    })
+
+    var deductionCount = 0
+    var possibleDeductionCount = 0
+    var nonDeductionCount = 0
+
+
+    const deductions = transactions.reduce((total, transaction) => {
+      if (transaction.deduction == 1) {
+        deductionCount++
+        return total + Math.abs(transaction.amount)
+      }
+      return total;
+    }, 0)
+    
+    const possibleDeductions = transactions.reduce((total, transaction) => {
+      if (transaction.flag_deduction == 1) {
+        possibleDeductionCount++
+        return total + Math.abs(transaction.amount)
+      }
+      return total;
+    }, 0)
+    
+    const nonDeductions = transactions.reduce((total, transaction) => {
+      if (transaction.flag_deduction == 0) {
+        nonDeductionCount++
+        return total + Math.abs(transaction.amount)
+      }
+      return total;
+    }, 0)
+    
+    const income = transactions.reduce((total, transaction) => {
+      if (transaction.direction == 'credit') {
+        return total + Math.abs(transaction.amount)
+      }
+      return total;
+    }, 0)
+
+    return {
+      ok: true,
+      deductionCount: deductionCount,
+      possibleDeductionCount: possibleDeductionCount,
+      nonDeductionCount: nonDeductionCount,
+      deductions: deductions,
+      possibleDeductions: possibleDeductions,
+      nonDeductions: nonDeductions,
+      totalTransation: transactions.length,
+      income: income
+    }
+
   }
 
   findAll() {

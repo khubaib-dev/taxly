@@ -20,11 +20,12 @@ import { UserType } from '../user-type/entities/user-type.entity'
 import { Profession } from '../profession/entities/profession.entity'
 import { OnBoarding } from '../on-boarding/entities/on-boarding.entity'
 import { OnBoardingQuestion } from '../on-boarding/entities/on-boarding-question.entity'
+import { Transaction } from '../transaction/entities/transaction.entity'
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([OnBoardingQuestion, User,Setting,Aichat,Criterion,Occupation]),
-    TypeOrmModule.forFeature([OnBoarding, Profession,UserType,Verification]),
+    TypeOrmModule.forFeature([Transaction,OnBoarding, Profession,UserType,Verification]),
     PassportModule,
     JwtModule
     // JwtModule.register({

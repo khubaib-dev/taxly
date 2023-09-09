@@ -11,9 +11,10 @@ import { UserType } from '../user-type/entities/user-type.entity'
 import { Profession } from '../profession/entities/profession.entity'
 import { OnBoarding } from '../on-boarding/entities/on-boarding.entity'
 import { OnBoardingQuestion } from '../on-boarding/entities/on-boarding-question.entity'
+import { Transaction } from '../transaction/entities/transaction.entity'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OnBoarding, OnBoardingQuestion, Profession, UserType, User, Setting, Criterion, Occupation])],
+  imports: [TypeOrmModule.forFeature([Transaction, OnBoarding, OnBoardingQuestion, Profession, UserType, User, Setting, Criterion, Occupation])],
   controllers: [UserController],
   providers: [UserService, JwtService],
   exports: [UserService],

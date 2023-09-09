@@ -120,6 +120,14 @@ async basiqAccounts(@Request() request)
 }
 
 @UseGuards(AuthGuard)
+@Get('dashboard')
+async dashboard(@Request() request)
+{
+  const userId = request.user.sub
+  return await this.userService.dashboard(userId)
+}
+
+@UseGuards(AuthGuard)
 @Get('basiqTransactions')
 async basiqTransactions(@Request() request)
 {
