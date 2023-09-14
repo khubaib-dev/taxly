@@ -102,4 +102,45 @@ export class TransactionService {
     })
   }
 
+  async userTransactions(id)
+  {
+    const approved = await this.transactionRepository.find({
+      where: {
+        userId: id,
+        deduction: 1
+      }
+    })
+    
+    const declined = await this.transactionRepository.find({
+      where: {
+        userId: id,
+        deduction: 2
+      }
+    })
+    
+    const possible = await this.transactionRepository.find({
+      where: {
+        userId: id,
+        flag_deduction: 1
+      }
+    })
+    
+    const later = await this.transactionRepository.find({
+      where: {
+        userId: id,
+        deduction: 0,
+        flag_deduction: 1
+      }
+    })
+
+    return {
+      ok: true,
+      approved :approved,
+      declined :declined,
+      possible :possible,
+      later :later
+    }
+
+  }
+
 }

@@ -23,4 +23,11 @@ export class TransactionController {
     return await this.transactionService.updateTransaction(userId,request.body)
   }
 
+  @UseGuards(AuthGuard)
+  @Get('userTransactions')
+  async userTransactions(@Request() request) {
+    const userId = request.user.sub
+    return await this.transactionService.userTransactions(userId)
+  }
+
 }
