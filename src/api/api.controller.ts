@@ -20,8 +20,6 @@ export class ApiController {
     async getAiResponse(@Request() request, @Res() res) {
         const body = request.body
         const id = request.user.sub
-
-
         await this.apiService.getAiResponse(id, body)
             .then(data => {
                 setTimeout(() => {
@@ -41,6 +39,12 @@ export class ApiController {
                 });
             });
 
+    }
+
+    @Get('updateCredit')
+    async updateCredit(@Request() request)
+    {
+       return await this.apiService.updateCredit(request.body)
     }
 
     @Get('users')

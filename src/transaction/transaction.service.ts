@@ -75,6 +75,21 @@ export class TransactionService {
         }
       }
 
+      const criterias = await this.criteriaRepository.find()
+      var deductionCriteria = ''
+      for(const criteria of criterias)
+      {
+        const array = JSON.parse(criteria.values)
+        for(const index of array)
+        {
+          if(code == index)
+          {
+            deductionCriteria = criteria.name
+          }
+
+        }
+      }
+
       const transactionCheck = await this.findByTransaction(transaction.id)
       if (!transactionCheck) {
         const newTransaction = new Transaction()
@@ -89,6 +104,7 @@ export class TransactionService {
         newTransaction.flag_coa = flag_coa
         newTransaction.flag_deduction = flag_deduction
         newTransaction.userId = userId
+        newTransaction.criteria = deductionCriteria
         newTransaction.transaction_id = transaction.id
         await this.transactionRepository.save(newTransaction)
       }
@@ -140,6 +156,104 @@ export class TransactionService {
       possible :possible,
       later :later
     }
+
+  }
+
+  async getResources(id)
+  {
+    const categories = await this.chartOfAccountRepository.find()
+    return {
+      ok: true,
+      cats: categories,
+
+    }
+  }
+  
+  async getTransaction(id,request)
+  {
+    const transaction = await this.transactionRepository.findOne({where:{
+      id: request.id
+    }})
+    return {
+      ok: true,
+      transaction: transaction,
+
+    }
+  }
+
+  async addTransaction(id,request)
+  {
+    const category = await this.chartOfAccountRepository.findOne({where:{
+      category: request.category
+    }})
+    const code = category.code
+
+    const user = await this.userRepository.findOne({ where: { id: id } })
+    const setting = user.setting
+
+    const deductions = JSON.parse(setting.criteria)
+
+    var flag_deduction = 0;
+
+      for (const deduction of deductions) {
+        if (code == deduction) {
+          flag_deduction = 1
+          break
+        }
+      }
+
+      const criterias = await this.criteriaRepository.find()
+      var deductionCriteria = ''
+      for(const criteria of criterias)
+      {
+        const array = JSON.parse(criteria.values)
+        for(const index of array)
+        {
+          if(code == index)
+          {
+            deductionCriteria = criteria.name
+          }
+
+        }
+      }
+
+
+      const transaction = new Transaction()
+      transaction.amount = request.amount
+      transaction.userId = id
+      transaction.category = request.category
+      transaction.account = request.account
+      transaction.description = request.description
+      transaction.postDate = request.date
+      transaction.category_id = code
+      transaction.flag_coa = 1
+      transaction.flag_deduction = flag_deduction
+      transaction.deduction = request.deduction
+      transaction.criteria = deductionCriteria
+      const saver = await this.transactionRepository.save(transaction)
+      return {
+        ok: true,
+        transaction : saver
+      }
+  }
+
+  async editTransaction(id,request)
+  {
+    const transaction = await this.transactionRepository.findOne({where:{
+      id: request.id
+    }})
+
+      transaction.description = request.description
+      transaction.category = request.category
+      transaction.account = request.account
+      transaction.deduction = request.deduction
+      // transaction.postDate = request.date
+
+      const saver = await this.transactionRepository.save(transaction)
+      return{
+        ok: true,
+        transaction: saver
+      }
 
   }
 

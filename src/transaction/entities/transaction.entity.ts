@@ -22,6 +22,9 @@ export class Transaction {
     account: string
     
     @Column({type: 'longtext',nullable: true})
+    criteria: string
+    
+    @Column({type: 'longtext',nullable: true})
     direction: string
     
     @Column({type: 'longtext',nullable: true})

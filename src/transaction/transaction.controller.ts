@@ -24,10 +24,40 @@ export class TransactionController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('getResources')
+  async getResources(@Request() request) {
+    const userId = request.user.sub
+    return await this.transactionService.getResources(userId)
+  }
+
+  @UseGuards(AuthGuard)
   @Get('userTransactions')
   async userTransactions(@Request() request) {
     const userId = request.user.sub
     return await this.transactionService.userTransactions(userId)
   }
+  
+  @UseGuards(AuthGuard)
+  @Post('getTransaction')
+  async getTransaction(@Request() request) {
+    const userId = request.user.sub
+    return await this.transactionService.getTransaction(userId,request.body)
+  }
+  
+  @UseGuards(AuthGuard)
+  @Post('addTransaction')
+  async addTransaction(@Request() request) {
+    const userId = request.user.sub
+    return await this.transactionService.addTransaction(userId,request.body)
+  }
+  
+  @UseGuards(AuthGuard)
+  @Post('editTransaction')
+  async editTransaction(@Request() request) {
+    const userId = request.user.sub
+    return await this.transactionService.editTransaction(userId,request.body)
+  }
+
+
 
 }

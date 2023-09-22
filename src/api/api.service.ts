@@ -8,11 +8,14 @@ import { AichatService } from '../aichat/aichat.service'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { User } from '../user/entities/user.entity'
+import { Aichat } from '../aichat/entities/aichat.entity'
 
 
 @Injectable()
 export class ApiService {
     private readonly basiqAPI: string;
+    private readonly aiApiToken: string;
+    private readonly openAIKey: string;
     private readonly aMemberAPI: string;  
     private transporter: nodemailer.Transporter;  
     
@@ -20,10 +23,14 @@ export class ApiService {
       private globalVariableContainer: GlobalVariableContainer,
       private readonly aiChatService: AichatService,
       @InjectRepository(User)
-        private readonly userRepository: Repository<User>
+        private readonly userRepository: Repository<User>,
+      @InjectRepository(Aichat)
+        private readonly aiChatRepository: Repository<Aichat>
       ) {
-        this.basiqAPI = process.env.BASIQ_API_KEY;
-        this.aMemberAPI = process.env.AMEMBER_API_KEY;
+        this.basiqAPI = process.env.BASIQ_API_KEY
+        this.aiApiToken = process.env.AI_API_TOKEN
+        this.openAIKey = process.env.OPEN_AI_KEY
+        this.aMemberAPI = process.env.AMEMBER_API_KEY
 
         this.transporter = nodemailer.createTransport({
           host: process.env.EMAIL_HOST,
@@ -113,21 +120,83 @@ export class ApiService {
         }
       }
 
+      async updateCredit(request)
+      {
+        const user = await this.userRepository.findOne({where:{
+            amember_id: request.user
+        }})
+
+        user.credits = request.credit
+        user.tickets = request.ticket
+        return await this.userRepository.save(user)
+
+      }
+
       async getAiResponse(id,query)
       {
-        this.aiChatService.createChat(id,query.query,query.type,query.transactionId)
+        const messages = []
+        if(query.system)
+        {
+          messages.push({
+            role:'system',
+            content:query.query
+          },)
+          await this.aiChatService.createChat(id,'Help me to understand this deduction for transaction?',query.type,query.transactionId)
+        }
+        else
+        {
+          await this.aiChatService.createChat(id,query.query,query.type,query.transactionId)
+        }
 
         //Call AI API below
-        // const url = process.env.AI_URI
-        // const config = {
-        //   usecase: 'ChatCall'
-        // }
-        // const response = await axios.post(url, query.query, config);
-        // return response.data
+        const chats = await this.aiChatRepository.find({where:{
+          transactionId: query.transactionId
+        }})
+
+        //system Response
+        const system = await this.aiChatRepository.findOne({where: {
+          transactionId: query.transactionId,
+          type: false
+        }})
+
+        if(system)
+        {
+          messages.push({
+            role:'system',
+            content:system.message
+          },)
+        }
+        
+
+        for(const chat of chats)
+        {
+          var role = 'assistant'
+          if(chat.type)
+          {
+            role = 'user'
+          }
+          messages.push({
+            role:role,
+            content:chat.message
+          },)
+        }
+
+        const url = 'https://api.writeme.ai/chatturbo/chat'
+        const config: AxiosRequestConfig = {
+          method: 'post',
+          url: url,
+          data: {
+            usecase: 'ChatCall',
+            back_auth: this.aiApiToken,
+            messages: messages
+          },
+        };
+
+        const response = await axios(config)
         //End of AI API call
-        this.aiChatService.createChat(id,'Response Fetched',false,query.transactionId)
+        await this.aiChatService.createChat(id,response.data.data,false,query.transactionId)
         return {
-          response: 'Response Fetched'
+          response: response.data.data
         }
       }
 
