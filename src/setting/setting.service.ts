@@ -33,9 +33,13 @@ export class SettingService {
 
     if(!setting)
     {
-      const setting = new Setting()
-      setting.user = id
-      await this.settingRepository.save(setting)
+      const addSetting = new Setting()
+      addSetting.user = id
+      await this.settingRepository.save(addSetting)
+
+      user = await this.userRepository.findOne({ where: { id } })
+
+      setting = user.setting
     }
 
     // Update seting

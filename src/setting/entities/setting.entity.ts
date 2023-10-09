@@ -12,11 +12,14 @@ export class Setting {
     @JoinColumn({ name: 'userId' })
     user: User;
 
-    @Column({ type: 'longtext' })
+    @Column({ type: 'longtext', nullable: true })
     help: string;
 
     @Column({nullable: true})
     tax_reminder: boolean
+    
+    @Column({nullable: true, default: 0})
+    status: boolean
 
     @Column({nullable: true})
     notification_type: boolean

@@ -89,7 +89,7 @@ export class UserService {
       ok: true,
       data: response.data
     }
-      
+
   }
 
   async create(amemberId, basiqId) {
@@ -105,8 +105,7 @@ export class UserService {
     return storeUser
   }
 
-  async dashboard(id)
-  {
+  async dashboard(id) {
     const user = await this.userRepository.findOne({ where: { id } })
 
     const transactions = await this.transactionRepository.find({
@@ -127,7 +126,7 @@ export class UserService {
       }
       return total;
     }, 0)
-    
+
     const possibleDeductions = transactions.reduce((total, transaction) => {
       if (transaction.flag_deduction == 1) {
         possibleDeductionCount++
@@ -135,7 +134,7 @@ export class UserService {
       }
       return total;
     }, 0)
-    
+
     const nonDeductions = transactions.reduce((total, transaction) => {
       if (transaction.flag_deduction == 0) {
         nonDeductionCount++
@@ -143,7 +142,7 @@ export class UserService {
       }
       return total;
     }, 0)
-    
+
     const income = transactions.reduce((total, transaction) => {
       if (transaction.direction == 'credit') {
         return total + Math.abs(transaction.amount)
@@ -295,6 +294,24 @@ export class UserService {
     return {
       ok: true,
       totalDeduction: JSON.parse(setting.criteria).length
+    }
+  }
+
+  async updateSetting(id) {
+
+    var user = await this.userRepository.findOne({ where: { id } })
+
+    var setting = user.setting
+
+    await this.settingRepository.update(setting.id, { status: true })
+
+    user = await this.userRepository.findOne({ where: { id } })
+
+    setting = user.setting
+
+    return {
+      ok: true,
+      setting: setting
     }
   }
 
@@ -523,7 +540,7 @@ export class UserService {
     }
 
   }
-  
+
   async getNames(id) {
     const apiKey = process.env.AMEMBER_API_KEY
     const base_url = process.env.AMEMBER_BASEURL
@@ -535,12 +552,53 @@ export class UserService {
       }
     }
 
-      const aMemberUser = await axios.get(`${base_url}/check-access/by-login`, payloadAccess)
-      return {
-        ok: true,
-        first: aMemberUser.data.name_f,
-        last: aMemberUser.data.name_l
+    const aMemberUser = await axios.get(`${base_url}/check-access/by-login`, payloadAccess)
+    return {
+      ok: true,
+      first: aMemberUser.data.name_f,
+      last: aMemberUser.data.name_l
+    }
+
+  }
+
+  async getUserSetting(id) {
+    var user = await this.userRepository.findOne({ where: { id } })
+    var setting = user.setting
+    var aMemberUser = null
+    if (!setting) {
+      const addSetting = new Setting()
+      addSetting.user = id
+      await this.settingRepository.save(addSetting)
+
+      user = await this.userRepository.findOne({ where: { id } })
+
+      setting = user.setting
+    }
+
+    if (setting.status) {
+      const apiKey = process.env.AMEMBER_API_KEY
+      const base_url = process.env.AMEMBER_BASEURL
+      user = await this.userRepository.findOne({ where: { id } })
+      const payloadAccess = {
+        params: {
+          _key: apiKey,
+          login: user.amember_id
+        }
       }
 
+      try {
+        aMemberUser = await axios.get(`${base_url}/check-access/by-login`, payloadAccess)
+        aMemberUser = aMemberUser.data
+        
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    return {
+      ok: true,
+      setting: setting,
+      user: aMemberUser
+    }
   }
 }

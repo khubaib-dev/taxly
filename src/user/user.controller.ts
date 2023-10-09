@@ -58,6 +58,13 @@ export class UserController {
     const userId = request.user.sub
     return await this.userService.basiqUser(userId)
   }
+  
+  @UseGuards(AuthGuard)
+  @Get('getUserSetting')
+  async getUserSetting(@Request() request) {
+    const userId = request.user.sub
+    return await this.userService.getUserSetting(userId)
+  }
 
   @UseGuards(AuthGuard)
   @Get('getUser')
@@ -173,6 +180,14 @@ async updateCriteria(@Request() request)
 {
   const userId = request.user.sub
   return await this.userService.updateCriteria(userId,request.body)
+}
+
+@UseGuards(AuthGuard)
+@Get('updateSetting')
+async updateSetting(@Request() request)
+{
+  const userId = request.user.sub
+  return await this.userService.updateSetting(userId)
 }
 
 
