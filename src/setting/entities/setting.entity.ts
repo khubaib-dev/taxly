@@ -20,6 +20,9 @@ export class Setting {
     
     @Column({nullable: true, default: 0})
     status: boolean
+    
+    @Column({nullable: true, default: 0})
+    flag_screen: boolean
 
     @Column({nullable: true})
     notification_type: boolean
