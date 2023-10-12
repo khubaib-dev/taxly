@@ -13,6 +13,7 @@ import { Profession } from '../profession/entities/profession.entity'
 import { OnBoarding } from '../on-boarding/entities/on-boarding.entity'
 import { OnBoardingQuestion } from '../on-boarding/entities/on-boarding-question.entity'
 import { Transaction } from '../transaction/entities/transaction.entity'
+import { Aichat } from '../aichat/entities/aichat.entity'
 import * as qs from 'qs';
 
 @Injectable()
@@ -39,6 +40,8 @@ export class UserService {
     private readonly userTypeRepository: Repository<UserType>,
     @InjectRepository(Profession)
     private readonly professionRepository: Repository<Profession>,
+    @InjectRepository(Aichat)
+    private readonly AIRepository: Repository<Aichat>,
 
   ) {
     this.basiqAPI = process.env.BASIQ_API_KEY
@@ -150,6 +153,21 @@ export class UserService {
       return total;
     }, 0)
 
+    const chats = await this.AIRepository.find({where: {
+      user_id: id
+    }})
+
+    const uniqueChats = chats.filter((chat, index, self) =>
+      index === self.findIndex((c) => c.transactionId === chat.transactionId)
+    );
+
+    let AIConsultWorth = 0;
+    for (const chat of uniqueChats) {
+      const transaction = await this.transactionRepository.findOne({ where: { transaction_id: chat.transactionId } });
+      AIConsultWorth += Math.abs(transaction.amount);
+    }
+
+
     return {
       ok: true,
       deductionCount: deductionCount,
@@ -159,7 +177,9 @@ export class UserService {
       possibleDeductions: possibleDeductions,
       nonDeductions: nonDeductions,
       totalTransation: transactions.length,
-      income: income
+      income: income,
+      AIConsults: uniqueChats.length,
+      AIConsultWorth: AIConsultWorth
     }
 
   }

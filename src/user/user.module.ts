@@ -12,9 +12,10 @@ import { Profession } from '../profession/entities/profession.entity'
 import { OnBoarding } from '../on-boarding/entities/on-boarding.entity'
 import { OnBoardingQuestion } from '../on-boarding/entities/on-boarding-question.entity'
 import { Transaction } from '../transaction/entities/transaction.entity'
+import { Aichat } from '../aichat/entities/aichat.entity'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Transaction, OnBoarding, OnBoardingQuestion, Profession, UserType, User, Setting, Criterion, Occupation])],
+  imports: [TypeOrmModule.forFeature([Aichat,Transaction, OnBoarding, OnBoardingQuestion, Profession, UserType, User, Setting, Criterion, Occupation])],
   controllers: [UserController],
   providers: [UserService, JwtService],
   exports: [UserService],
