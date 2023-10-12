@@ -183,6 +183,23 @@ export class UserService {
     }
 
   }
+  
+  async quaterly(id) {
+    const user = await this.userRepository.findOne({ where: { id } })
+
+    const transactions = await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .select(['DISTINCT transaction.category', 'SUM(ABS(transaction.amount)) AS totalAmount'])
+      .where(`transaction.userId = ${ id }`)
+      .andWhere('transaction.deduction = 1')
+      .groupBy('transaction.category').getRawMany()
+
+    return {
+      ok: true,
+      transactions:transactions
+    }
+
+  }
 
   findAll() {
     const users = this.userRepository.find()

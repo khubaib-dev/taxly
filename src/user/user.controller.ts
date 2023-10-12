@@ -135,6 +135,14 @@ async dashboard(@Request() request)
 }
 
 @UseGuards(AuthGuard)
+@Get('quaterly')
+async quaterly(@Request() request)
+{
+  const userId = request.user.sub
+  return await this.userService.quaterly(userId)
+}
+
+@UseGuards(AuthGuard)
 @Get('basiqTransactions')
 async basiqTransactions(@Request() request)
 {
